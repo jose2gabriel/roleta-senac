@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roleta Sorteadora Senac</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#004A8D; --azul-esc:#00305C; --laranja:#F7941D; --laranja-esc:#D9770A;
+    --branco:#fff; --cinza:#EEF3F8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Montserrat',system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--azul) 0%,var(--azul-esc) 100%);
+    color:var(--branco); min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  header{width:100%;padding:18px 28px;display:flex;align-items:center;gap:14px;
+    border-bottom:4px solid var(--laranja);background:rgba(0,0,0,.12)}
+  .marca{font-weight:800;font-size:28px;letter-spacing:-1px}
+  .marca span{color:var(--laranja)}
+  header p{opacity:.8;font-size:14px}
+  main{flex:1;width:100%;max-width:1150px;display:grid;grid-template-columns:1fr 340px;
+    gap:32px;padding:32px 24px;align-items:center}
+  @media(max-width:860px){main{grid-template-columns:1fr}}
+  .roda-wrap{position:relative;display:flex;justify-content:center;align-items:center}
+  canvas{width:min(560px,88vw);height:auto;aspect-ratio:1;border-radius:50%;
+    box-shadow:0 0 0 10px var(--branco),0 0 0 16px var(--laranja),0 20px 60px rgba(0,0,0,.45)}
+  .seta{position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+    width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;
+    border-top:44px solid var(--laranja);filter:drop-shadow(0 4px 4px rgba(0,0,0,.4));z-index:2}
+  .centro{position:absolute;width:96px;height:96px;border-radius:50%;background:var(--branco);
+    border:6px solid var(--laranja);display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:var(--azul);font-size:20px;cursor:pointer;user-select:none;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .15s}
+  .centro:hover{transform:scale(1.06)}
+  .painel{background:var(--branco);color:var(--azul-esc);border-radius:16px;padding:22px;
+    box-shadow:0 14px 40px rgba(0,0,0,.3)}
+  .painel h2{font-size:18px;margin-bottom:6px}
+  .painel small{color:#5a6b7d;display:block;margin-bottom:10px}
+  textarea{width:100%;height:230px;border:2px solid #d3dde8;border-radius:10px;padding:10px;
+    font-family:inherit;font-size:14px;resize:vertical;color:var(--azul-esc);
+    background:linear-gradient(180deg,#F3F7FC 0%,#E6EEF7 100%);line-height:1.6}
+  textarea:focus{outline:none;border-color:var(--laranja);background:#FFF8EF;
+    box-shadow:0 0 0 3px rgba(247,148,29,.2)}
+  .btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  button{font-family:inherit;font-weight:700;border:none;border-radius:10px;padding:12px 16px;
+    cursor:pointer;font-size:14px;transition:background .15s,transform .1s}
+  button:active{transform:scale(.97)}
+  .girar{background:var(--laranja);color:#fff;flex:1;font-size:16px}
+  .girar:hover{background:var(--laranja-esc)}
+  .girar:disabled{background:#c9c9c9;cursor:not-allowed}
+  .sec{background:var(--cinza);color:var(--azul)}
+  .sec:hover{background:#dde7f1}
+  label.chk{display:flex;gap:8px;align-items:center;font-size:13px;margin-top:12px;cursor:pointer}
+  .hist{margin-top:14px;font-size:13px;max-height:90px;overflow:auto}
+  .hist b{color:var(--laranja-esc)}
+  /* modal vencedor */
+  .modal{position:fixed;inset:0;background:rgba(0,20,45,.75);display:none;align-items:center;
+    justify-content:center;z-index:10}
+  .modal.on{display:flex}
+  .modal.on{background:radial-gradient(circle at center,rgba(247,148,29,.35) 0%,rgba(0,20,45,.85) 60%)}
+  .modal.on::before{content:"";position:absolute;width:900px;height:900px;
+    background:repeating-conic-gradient(rgba(255,213,74,.18) 0deg 10deg,transparent 10deg 20deg);
+    border-radius:50%;animation:raios 12s linear infinite}
+  @keyframes raios{to{transform:rotate(360deg)}}
+  .card{position:relative;background:#fff;color:var(--azul);border-radius:24px;padding:40px 60px;text-align:center;
+    border-top:12px solid var(--laranja);animation:pop .6s cubic-bezier(.2,1.6,.4,1);max-width:90vw;
+    box-shadow:0 0 0 6px rgba(255,255,255,.3),0 0 60px rgba(247,148,29,.8)}
+  .card .trofeu{font-size:72px;line-height:1;animation:pula 1s ease-in-out infinite}
+  .card h3{font-size:18px;text-transform:uppercase;letter-spacing:3px;color:var(--laranja-esc);margin-top:8px}
+  .card .nome{font-size:clamp(40px,7vw,72px);font-weight:800;margin:10px 0 6px;word-break:break-word;
+    background:linear-gradient(90deg,var(--azul),var(--laranja),var(--azul));background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:brilho 2s linear infinite, pulso 1.2s ease-in-out infinite}
+  .card .parabens{font-size:18px;color:#5a6b7d;margin-bottom:24px;font-weight:600}
+  @keyframes pop{0%{transform:scale(.2) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  @keyframes pula{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-14px) rotate(6deg)}}
+  @keyframes brilho{to{background-position:200% center}}
+  @keyframes pulso{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  /* painel secreto */
+  .secreto{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,.85);color:#fff;
+    padding:14px;border-radius:10px;font-size:13px;display:none;z-index:20;width:240px}
+  .secreto.on{display:block}
+  .secreto select{width:100%;margin:8px 0;padding:6px;border-radius:6px;font-family:inherit}
+  .ponto{position:fixed;bottom:6px;left:6px;width:5px;height:5px;border-radius:50%;
+    background:rgba(255,255,255,.25);display:none}
+  .ponto.on{display:block}
+  footer{font-size:12px;opacity:.6;padding:12px}
+  canvas.confete{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;
+    box-shadow:none;border-radius:0;aspect-ratio:auto;z-index:11}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca">Senac<span>.</span></div>
+  <p>Roleta Sorteadora</p>
+</header>
+
+<main>
+  <div class="roda-wrap">
+    <div class="seta"></div>
+    <canvas id="roda" width="1000" height="1000"></canvas>
+    <div class="centro" id="btnCentro">GIRAR</div>
+  </div>
+
+  <div class="painel">
+    <h2>Participantes</h2>
+    <small>Um nome por linha</small>
+    <textarea id="nomes">Ana
+Bruno
+Carla
+Diego
+Eduarda
+Felipe
+Gabriela
+Heitor</textarea>
+    <div class="btns">
+      <button class="girar" id="btnGirar">🎯 Girar roleta</button>
+      <button class="sec" id="btnEmbaralhar">Embaralhar</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="remover"> Remover sorteado da roleta</label>
+    <div class="hist" id="hist"></div>
+  </div>
+</main>
+
+<footer>Roleta ilustrativa · tema Senac</footer>
+
+<div class="modal" id="modal">
+  <div class="card">
+    <div class="trofeu">🏆</div>
+    <h3>🎉 Temos um(a) vencedor(a)! 🎉</h3>
+    <div class="nome" id="nomeVencedor"></div>
+    <div class="parabens">Parabéns! Você foi sorteado(a) na Roleta Senac!</div>
+    <button class="girar" id="btnFechar">Fechar</button>
+  </div>
+</div>
+
+<div class="secreto" id="secreto">
+  <b>Modo viciado</b><br>
+  Próximo vencedor:
+  <select id="selVicio"></select>
+  <button class="sec" id="btnLimparVicio" style="width:100%;padding:8px">Desligar</button>
+  <div style="opacity:.6;margin-top:8px;font-size:11px">Alt+Shift+R abre/fecha · Esc fecha</div>
+</div>
+<div class="ponto" id="ponto"></div>
+<canvas class="confete" id="confete"></canvas>
+
+<script>
+const cv = document.getElementById('roda'), ctx = cv.getContext('2d');
+const txt = document.getElementById('nomes');
+const cores = ['#004A8D','#F7941D','#0A66B8','#FFB347','#00305C','#E8850F'];
+let itens = [], angulo = 0, girando = false, vicio = null; // vicio = nome forçado
+
+function lerNomes(){ itens = txt.value.split('\n').map(s=>s.trim()).filter(Boolean); }
+
+function desenhar(){
+  const W = cv.width, R = W/2, n = itens.length;
+  ctx.clearRect(0,0,W,W);
+  if(!n){ ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(R,R,R,0,7);ctx.fill();return; }
+  const fatia = 2*Math.PI/n;
+  for(let i=0;i<n;i++){
+    const a0 = angulo + i*fatia - Math.PI/2;
+    ctx.beginPath(); ctx.moveTo(R,R); ctx.arc(R,R,R,a0,a0+fatia); ctx.closePath();
+    ctx.fillStyle = cores[i % cores.length];
+    if(n % cores.length === 1 && i === n-1) ctx.fillStyle = cores[2];
+    ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=3; ctx.stroke();
+    ctx.save(); ctx.translate(R,R); ctx.rotate(a0+fatia/2);
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    const fs = Math.max(18, Math.min(46, 420/n + 14));
+    ctx.font = `700 ${fs}px Montserrat, sans-serif`;
+    const claro = ['#F7941D','#FFB347','#E8850F'].includes(ctx.fillStyle.toUpperCase());
+    ctx.fillStyle = '#fff';
+    let t = itens[i]; if(t.length>18) t = t.slice(0,17)+'…';
+    ctx.fillText(t, R-40, 0); ctx.restore();
+  }
+}
+
+function indiceNoPonteiro(){
+  const n = itens.length, fatia = 2*Math.PI/n;
+  // ponteiro fica no topo (-90°). fatia i ocupa [angulo + i*fatia, ...] relativo ao topo
+  let rel = ((-angulo) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  return Math.floor(rel / fatia) % n;
+}
+
+function girar(){
+  if(girando) return;
+  lerNomes(); if(itens.length < 2){ desenhar(); return; }
+  girando = true; document.getElementById('btnGirar').disabled = true;
+  document.getElementById('secreto').classList.remove('on');
+  const n = itens.length, fatia = 2*Math.PI/n;
+  let alvo;
+  const iv = vicio !== null ? itens.indexOf(vicio) : -1;
+  if(iv >= 0){
+    // posição dentro da fatia escolhida, com folga pra não cair na borda
+    const dentro = fatia*(0.2 + Math.random()*0.6);
+    alvo = -(iv*fatia + dentro);
+  } else {
+    alvo = -Math.random()*2*Math.PI;
+  }
+  // normaliza e adiciona voltas
+  const voltas = 6 + Math.floor(Math.random()*3);
+  const atualNorm = angulo % (2*Math.PI);
+  let delta = (alvo - atualNorm) % (2*Math.PI);
+  if(delta > 0) delta -= 2*Math.PI;
+  const inicio = angulo, fim = angulo + delta - voltas*2*Math.PI;
+  const dur = 5200, t0 = performance.now();
+  // sentido horário visual: ângulo diminuindo gira anti-horário; inverte pra horário
+  const ini2 = -inicio, fim2 = -fim; // usamos valor positivo crescente
+  function frame(t){
+    const p = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-p,4);
+    angulo = inicio + (fim-inicio)*e;
+    desenhar();
+    if(p<1) requestAnimationFrame(frame); else terminou();
+  }
+  requestAnimationFrame(frame);
+}
+
+function terminou(){
+  girando = false; document.getElementById('btnGirar').disabled = false;
+  const nome = itens[indiceNoPonteiro()];
+  document.getElementById('nomeVencedor').textContent = nome;
+  document.getElementById('modal').classList.add('on');
+  const h = document.getElementById('hist');
+  h.innerHTML = `<div><b>${h.children.length+1}º</b> ${nome.replace(/</g,'&lt;')}</div>` + h.innerHTML;
+  if(vicio !== null){ vicio = null; atualizarVicio(); }
+  confete();
+  if(document.getElementById('remover').checked){
+    const linhas = txt.value.split('\n'); const k = linhas.findIndex(l=>l.trim()===nome);
+    if(k>=0){ linhas.splice(k,1); txt.value = linhas.join('\n'); }
+  }
+}
+
+function embaralhar(){
+  lerNomes();
+  for(let i=itens.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[itens[i],itens[j]]=[itens[j],itens[i]];}
+  txt.value = itens.join('\n'); desenhar(); preencherSelect();
+}
+
+/* ---- modo viciado ---- */
+const sec = document.getElementById('secreto'), sel = document.getElementById('selVicio');
+function preencherSelect(){
+  lerNomes();
+  sel.innerHTML = '<option value="">— aleatório —</option>' +
+    itens.map(n=>`<option>${n.replace(/</g,'&lt;')}</option>`).join('');
+  sel.value = vicio ?? '';
+}
+function atualizarVicio(){
+  document.getElementById('ponto').classList.toggle('on', vicio !== null);
+  if(sel) sel.value = vicio ?? '';
+}
+sel.addEventListener('change',()=>{ vicio = sel.value || null; atualizarVicio(); });
+document.getElementById('btnLimparVicio').onclick = ()=>{ vicio=null; atualizarVicio(); sec.classList.remove('on'); };
+document.addEventListener('keydown', e=>{
+  if(e.altKey && e.shiftKey && e.code === 'KeyR'){
+    e.preventDefault(); preencherSelect(); sec.classList.toggle('on');
+  } else if(e.key === 'Escape'){
+    sec.classList.remove('on'); document.getElementById('modal').classList.remove('on');
+  } else if(e.code === 'Space' && document.activeElement !== txt){
+    e.preventDefault(); girar();
+  }
+});
+
+/* ---- comemoração ---- */
+const CORES_FESTA = ['#F7941D','#004A8D','#ffffff','#FFB347','#FFD54A','#0A66B8'];
+function confete(){
+  const c = document.getElementById('confete'), g = c.getContext('2d');
+  c.width = innerWidth; c.height = innerHeight;
+  const W = c.width, H = c.height, ps = [];
+  const rnd = (a,b)=>a+Math.random()*(b-a), cor = ()=>CORES_FESTA[Math.floor(Math.random()*CORES_FESTA.length)];
+  // canhões laterais
+  function canhao(lado){
+    for(let i=0;i<140;i++){
+      const ang = lado<0 ? rnd(-1.35,-0.6) : rnd(-2.55,-1.8), v = rnd(14,26);
+      ps.push({x:lado<0?0:W,y:H,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,r:rnd(0,6.28),vr:rnd(-.3,.3),
+        s:rnd(8,15),cor:cor(),tipo:Math.random()<.3?'c':'r',g:.35,ar:.985,vida:1e9});
+    }
+  }
+  // chuva do topo
+  function chuva(){
+    for(let i=0;i<200;i++) ps.push({x:rnd(0,W),y:rnd(-H*.6,-10),vx:rnd(-2,2),vy:rnd(2,5),r:rnd(0,6.28),
+      vr:rnd(-.2,.2),s:rnd(6,12),cor:cor(),tipo:Math.random()<.3?'c':'r',g:.05,ar:.995,vida:1e9});
+  }
+  // fogos
+  function fogo(){
+    const x = rnd(W*.15,W*.85), y = rnd(H*.12,H*.45), c1 = cor();
+    for(let i=0;i<70;i++){ const a = i/70*6.28, v = rnd(3,8);
+      ps.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:0,vr:0,s:rnd(3,5),cor:Math.random()<.7?c1:'#fff',
+        tipo:'f',g:.06,ar:.97,vida:rnd(55,85)}); }
+  }
+  canhao(-1); canhao(1);
+  setTimeout(chuva, 400);
+  [300,800,1300,1800,2400,3000,3600].forEach(t=>setTimeout(fogo,t));
+  const t0 = performance.now();
+  (function f(t){
+    g.clearRect(0,0,W,H);
+    for(const p of ps){
+      p.vx*=p.ar; p.vy=p.vy*p.ar+p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.vida--;
+      if(p.vida<=0 || p.y>H+40) continue;
+      g.save(); g.translate(p.x,p.y); g.rotate(p.r); g.fillStyle=p.cor;
+      if(p.tipo==='f'){ g.globalAlpha=Math.min(1,p.vida/30); g.shadowColor=p.cor; g.shadowBlur=10;
+        g.beginPath(); g.arc(0,0,p.s,0,6.28); g.fill(); }
+      else if(p.tipo==='c'){ g.beginPath(); g.arc(0,0,p.s/2.5,0,6.28); g.fill(); }
+      else g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
+      g.restore();
+    }
+    if(t-t0<7000) requestAnimationFrame(f); else g.clearRect(0,0,W,H);
+  })(t0);
+  fanfarra();
+}
+function fanfarra(){
+  try{
+    const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    const ac = new AC(), notas = [[523,0],[659,.15],[784,.3],[1047,.45],[784,.7],[1047,.85]];
+    notas.forEach(([fq,t],i)=>{
+      const o = ac.createOscillator(), gn = ac.createGain();
+      o.type='triangle'; o.frequency.value=fq; o.connect(gn); gn.connect(ac.destination);
+      const ini = ac.currentTime+t, dur = i===notas.length-1 ? .9 : .18;
+      gn.gain.setValueAtTime(0,ini); gn.gain.linearRampToValueAtTime(.25,ini+.02);
+      gn.gain.exponentialRampToValueAtTime(.001,ini+dur); o.start(ini); o.stop(ini+dur+.05);
+    });
+  }catch(e){}
+}
+
+document.getElementById('btnGirar').onclick = girar;
+document.getElementById('btnCentro').onclick = girar;
+document.getElementById('btnEmbaralhar').onclick = embaralhar;
+document.getElementById('btnFechar').onclick = ()=>document.getElementById('modal').classList.remove('on');
+txt.addEventListener('input',()=>{ if(!girando){ lerNomes(); desenhar(); } });
+document.fonts && document.fonts.ready.then(()=>{ lerNomes(); desenhar(); });
+lerNomes(); desenhar();
+</script>
+</body>
+</html>
