@@ -22,6 +22,9 @@
   .marca{font-weight:800;font-size:28px;letter-spacing:-1px}
   .marca span{color:var(--laranja)}
   header p{opacity:.8;font-size:14px}
+  .status{margin-left:auto;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;
+    background:rgba(255,255,255,.12);white-space:nowrap}
+  .status.on{background:rgba(46,204,113,.25)}
   main{flex:1;width:100%;max-width:1150px;display:grid;grid-template-columns:1fr 340px;
     gap:32px;padding:32px 24px;align-items:center}
   @media(max-width:860px){main{grid-template-columns:1fr}}
@@ -97,6 +100,7 @@
 <header>
   <div class="marca">Senac<span>.</span></div>
   <p>Roleta Sorteadora</p>
+  <span class="status" id="status">⚪ conectando…</span>
 </header>
 
 <main>
@@ -148,11 +152,14 @@ Heitor</textarea>
 <div class="ponto" id="ponto"></div>
 <canvas class="confete" id="confete"></canvas>
 
+<script src="https://unpkg.com/mqtt@5.16.1/dist/mqtt.min.js"></script>
 <script>
 const cv = document.getElementById('roda'), ctx = cv.getContext('2d');
 const txt = document.getElementById('nomes');
 const cores = ['#004A8D','#F7941D','#0A66B8','#FFB347','#00305C','#E8850F'];
+const chkRemover = document.getElementById('remover');
 let itens = [], angulo = 0, girando = false, vicio = null; // vicio = nome forçado
+let historico = [];
 
 function lerNomes(){ itens = txt.value.split('\n').map(s=>s.trim()).filter(Boolean); }
 
@@ -178,18 +185,16 @@ function desenhar(){
   }
 }
 
-function indiceNoPonteiro(){
+function indiceEm(ang){
   const n = itens.length, fatia = 2*Math.PI/n;
-  // ponteiro fica no topo (-90°). fatia i ocupa [angulo + i*fatia, ...] relativo ao topo
-  let rel = ((-angulo) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  // ponteiro fica no topo (-90°). fatia i ocupa [ang + i*fatia, ...] relativo ao topo
+  let rel = ((-ang) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
   return Math.floor(rel / fatia) % n;
 }
 
 function girar(){
   if(girando) return;
   lerNomes(); if(itens.length < 2){ desenhar(); return; }
-  girando = true; document.getElementById('btnGirar').disabled = true;
-  document.getElementById('secreto').classList.remove('on');
   const n = itens.length, fatia = 2*Math.PI/n;
   let alvo;
   const iv = vicio !== null ? itens.indexOf(vicio) : -1;
@@ -205,38 +210,59 @@ function girar(){
   const atualNorm = angulo % (2*Math.PI);
   let delta = (alvo - atualNorm) % (2*Math.PI);
   if(delta > 0) delta -= 2*Math.PI;
-  const inicio = angulo, fim = angulo + delta - voltas*2*Math.PI;
-  const dur = 5200, t0 = performance.now();
-  // sentido horário visual: ângulo diminuindo gira anti-horário; inverte pra horário
-  const ini2 = -inicio, fim2 = -fim; // usamos valor positivo crescente
-  function frame(t){
-    const p = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-p,4);
-    angulo = inicio + (fim-inicio)*e;
-    desenhar();
-    if(p<1) requestAnimationFrame(frame); else terminou();
+  const fim = angulo + delta - voltas*2*Math.PI;
+  const vencedor = itens[indiceEm(fim)];
+  let nomesDepois = txt.value;
+  if(chkRemover.checked){
+    const linhas = txt.value.split('\n'); const k = linhas.findIndex(l=>l.trim()===vencedor);
+    if(k>=0){ linhas.splice(k,1); nomesDepois = linhas.join('\n'); }
   }
-  requestAnimationFrame(frame);
+  // o giro inteiro é decidido aqui e enviado pra todos; cada tela só anima
+  const g = { id: EU + Date.now(), de: angulo, para: fim, nomes: txt.value, vencedor,
+              depois: { nomes: nomesDepois, hist: [vencedor, ...historico] } };
+  if(vicio !== null){ vicio = null; atualizarVicio(); }
+  publicar({ giro: g });
+  executarGiro(g);
 }
 
-function terminou(){
-  girando = false; document.getElementById('btnGirar').disabled = false;
-  const nome = itens[indiceNoPonteiro()];
-  document.getElementById('nomeVencedor').textContent = nome;
-  document.getElementById('modal').classList.add('on');
-  const h = document.getElementById('hist');
-  h.innerHTML = `<div><b>${h.children.length+1}º</b> ${nome.replace(/</g,'&lt;')}</div>` + h.innerHTML;
-  if(vicio !== null){ vicio = null; atualizarVicio(); }
-  confete();
-  if(document.getElementById('remover').checked){
-    const linhas = txt.value.split('\n'); const k = linhas.findIndex(l=>l.trim()===nome);
-    if(k>=0){ linhas.splice(k,1); txt.value = linhas.join('\n'); }
+function executarGiro(g){
+  giroAtual = g.id; txt.value = g.nomes; lerNomes();
+  girando = true; document.getElementById('btnGirar').disabled = true;
+  document.getElementById('secreto').classList.remove('on');
+  document.getElementById('modal').classList.remove('on');
+  const dur = 5200, t0 = performance.now();
+  function frame(t){
+    if(giroAtual !== g.id || g.feito) return; // outro giro chegou e substituiu este
+    const p = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-p,4);
+    angulo = g.de + (g.para-g.de)*e;
+    desenhar();
+    if(p<1) requestAnimationFrame(frame); else terminou(g);
   }
+  requestAnimationFrame(frame);
+  // aba em segundo plano pausa a animação; garante o fim pelo relógio
+  setTimeout(()=>{ if(giroAtual === g.id && !g.feito){ terminou(g); desenhar(); } }, dur + 200);
+}
+
+function terminou(g){
+  g.feito = true; girando = false; document.getElementById('btnGirar').disabled = false;
+  angulo = g.para;
+  document.getElementById('nomeVencedor').textContent = g.vencedor;
+  document.getElementById('modal').classList.add('on');
+  historico = g.depois.hist; renderHist();
+  txt.value = g.depois.nomes;
+  confete();
+}
+
+function renderHist(){
+  const total = historico.length;
+  document.getElementById('hist').innerHTML = historico.map((nome,i)=>
+    `<div><b>${total-i}º</b> ${nome.replace(/</g,'&lt;')}</div>`).join('');
 }
 
 function embaralhar(){
   lerNomes();
   for(let i=itens.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[itens[i],itens[j]]=[itens[j],itens[i]];}
-  txt.value = itens.join('\n'); desenhar(); preencherSelect();
+  txt.value = itens.join('\n'); desenhar(); preencherSelect(); publicar();
 }
 
 /* ---- modo viciado ---- */
@@ -328,7 +354,56 @@ document.getElementById('btnGirar').onclick = girar;
 document.getElementById('btnCentro').onclick = girar;
 document.getElementById('btnEmbaralhar').onclick = embaralhar;
 document.getElementById('btnFechar').onclick = ()=>document.getElementById('modal').classList.remove('on');
-txt.addEventListener('input',()=>{ if(!girando){ lerNomes(); desenhar(); } });
+let tEdicao;
+txt.addEventListener('input',()=>{
+  if(girando) return;
+  lerNomes(); desenhar();
+  clearTimeout(tEdicao); tEdicao = setTimeout(()=>publicar(), 300);
+});
+chkRemover.addEventListener('change',()=>publicar());
+
+/* ---- sincronização: todos com o link (mesma sala) veem a mesma roleta ---- */
+// sala pelo endereço: .../roleta-senac/#turma2 → sala "turma2"; sem # → "principal"
+const SALA = decodeURIComponent(location.hash.slice(1)) || 'principal';
+const TOPICO = 'jose2gabriel/roleta-senac/v1/' + SALA;
+const EU = Math.random().toString(36).slice(2, 10);
+let cliente = null, giroAtual = null;
+
+function status(on){
+  const el = document.getElementById('status');
+  el.classList.toggle('on', on);
+  el.textContent = on ? `🟢 ao vivo · sala ${SALA}` : '🔴 offline · só nesta tela';
+}
+
+function publicar(extra = {}){
+  if(!cliente || !cliente.connected) return;
+  const msg = { nomes: txt.value, hist: historico, remover: chkRemover.checked, angulo, origem: EU, ...extra };
+  // retain: quem abrir o site depois recebe o último estado
+  cliente.publish(TOPICO, JSON.stringify(msg), { retain: true, qos: 1 });
+}
+
+function aoReceber(msg, retido){
+  if(msg.origem === EU && !retido) return; // eco da própria mensagem
+  if(msg.giro && !retido){ executarGiro(msg.giro); return; }
+  if(girando) return;
+  // mensagem retida de um giro antigo: aplica direto o resultado, sem animar
+  const s = msg.giro ? { ...msg.giro.depois, angulo: msg.giro.para } : msg;
+  txt.value = s.nomes; historico = s.hist || []; angulo = s.angulo || 0;
+  chkRemover.checked = !!msg.remover;
+  renderHist(); lerNomes(); desenhar();
+}
+
+function conectar(){
+  if(!window.mqtt){ status(false); return; }
+  cliente = mqtt.connect('wss://broker.emqx.io:8084/mqtt',
+    { clientId: 'roleta_' + EU, reconnectPeriod: 2000, connectTimeout: 10000 });
+  cliente.on('connect', ()=>{ status(true); cliente.subscribe(TOPICO, { qos: 1 }); });
+  cliente.on('close', ()=>status(false));
+  cliente.on('message', (t, buf, pkt)=>{
+    try{ aoReceber(JSON.parse(buf.toString()), pkt.retain); }catch(e){}
+  });
+}
+conectar();
 document.fonts && document.fonts.ready.then(()=>{ lerNomes(); desenhar(); });
 lerNomes(); desenhar();
 </script>
