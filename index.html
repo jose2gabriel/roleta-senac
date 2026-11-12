@@ -87,7 +87,12 @@
   .secreto{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,.85);color:#fff;
     padding:14px;border-radius:10px;font-size:13px;display:none;z-index:20;width:240px}
   .secreto.on{display:block}
-  .secreto select{width:100%;margin:8px 0;padding:6px;border-radius:6px;font-family:inherit}
+  .secreto select,.secreto input[type=password]{width:100%;margin:8px 0;padding:6px;border-radius:6px;
+    font-family:inherit;border:none}
+  .secreto .erro{color:#ff8a80;font-size:11px;display:none}
+  .secreto .lista{max-height:140px;overflow:auto;margin:6px 0 10px;background:rgba(255,255,255,.08);
+    border-radius:6px;padding:6px}
+  .secreto .lista label{display:flex;gap:6px;align-items:center;padding:2px 0;cursor:pointer}
   .ponto{position:fixed;bottom:6px;left:6px;width:5px;height:5px;border-radius:50%;
     background:rgba(255,255,255,.25);display:none}
   .ponto.on{display:block}
@@ -144,9 +149,17 @@ Heitor</textarea>
 
 <div class="secreto" id="secreto">
   <b>Modo viciado</b><br>
-  Próximo vencedor:
-  <select id="selVicio"></select>
-  <button class="sec" id="btnLimparVicio" style="width:100%;padding:8px">Desligar</button>
+  <div id="travado">
+    <input type="password" id="senha" inputmode="numeric" placeholder="Senha" autocomplete="off">
+    <div class="erro" id="senhaErro">Senha incorreta</div>
+  </div>
+  <div id="liberado" style="display:none">
+    Próximo vencedor:
+    <select id="selVicio"></select>
+    Nunca sortear:
+    <div class="lista" id="listaExcluir"></div>
+    <button class="sec" id="btnLimparVicio" style="width:100%;padding:8px">Desligar tudo</button>
+  </div>
   <div style="opacity:.6;margin-top:8px;font-size:11px">Alt+Shift+R abre/fecha · Esc fecha</div>
 </div>
 <div class="ponto" id="ponto"></div>
@@ -159,6 +172,7 @@ const txt = document.getElementById('nomes');
 const cores = ['#004A8D','#F7941D','#0A66B8','#FFB347','#00305C','#E8850F'];
 const chkRemover = document.getElementById('remover');
 let itens = [], angulo = 0, girando = false, vicio = null; // vicio = nome forçado
+const excluidos = new Set(); // nomes que nunca são sorteados (só nesta tela)
 let historico = [];
 
 function lerNomes(){ itens = txt.value.split('\n').map(s=>s.trim()).filter(Boolean); }
@@ -197,7 +211,12 @@ function girar(){
   lerNomes(); if(itens.length < 2){ desenhar(); return; }
   const n = itens.length, fatia = 2*Math.PI/n;
   let alvo;
-  const iv = vicio !== null ? itens.indexOf(vicio) : -1;
+  let iv = vicio !== null ? itens.indexOf(vicio) : -1;
+  if(iv < 0 && excluidos.size){
+    // sorteia só entre quem não está excluído (se sobrar alguém)
+    const pode = itens.map((_,i)=>i).filter(i=>!excluidos.has(itens[i]));
+    if(pode.length) iv = pode[Math.floor(Math.random()*pode.length)];
+  }
   if(iv >= 0){
     // posição dentro da fatia escolhida, com folga pra não cair na borda
     const dentro = fatia*(0.2 + Math.random()*0.6);
@@ -228,7 +247,7 @@ function girar(){
 function executarGiro(g){
   giroAtual = g.id; txt.value = g.nomes; lerNomes();
   girando = true; document.getElementById('btnGirar').disabled = true;
-  document.getElementById('secreto').classList.remove('on');
+  fecharSecreto();
   document.getElementById('modal').classList.remove('on');
   const dur = 5200, t0 = performance.now();
   function frame(t){
@@ -267,24 +286,56 @@ function embaralhar(){
 
 /* ---- modo viciado ---- */
 const sec = document.getElementById('secreto'), sel = document.getElementById('selVicio');
+const campoSenha = document.getElementById('senha');
+// SHA-256 da senha (a senha em si não fica escrita no código)
+const HASH_SENHA = '1c918023d679a37e1f3338c9029fe54730b3338643dea17773a25e4c67956699';
+async function sha256(t){
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function travar(on){
+  document.getElementById('travado').style.display = on ? '' : 'none';
+  document.getElementById('liberado').style.display = on ? 'none' : '';
+  document.getElementById('senhaErro').style.display = 'none';
+  campoSenha.value = '';
+}
+campoSenha.addEventListener('keydown', async e=>{
+  if(e.key !== 'Enter') return;
+  if(await sha256(campoSenha.value) === HASH_SENHA){ preencherSelect(); travar(false); }
+  else { document.getElementById('senhaErro').style.display = 'block'; campoSenha.select(); }
+});
+function abrirSecreto(){
+  // pede a senha toda vez que o painel abre
+  travar(true); sec.classList.add('on'); campoSenha.focus();
+}
+function fecharSecreto(){ sec.classList.remove('on'); travar(true); }
 function preencherSelect(){
   lerNomes();
+  const esc = n=>n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
   sel.innerHTML = '<option value="">— aleatório —</option>' +
-    itens.map(n=>`<option>${n.replace(/</g,'&lt;')}</option>`).join('');
+    itens.map(n=>`<option>${esc(n)}</option>`).join('');
   sel.value = vicio ?? '';
+  document.getElementById('listaExcluir').innerHTML = itens.map(n=>
+    `<label><input type="checkbox" value="${esc(n)}"${excluidos.has(n)?' checked':''}> ${esc(n)}</label>`).join('');
 }
 function atualizarVicio(){
-  document.getElementById('ponto').classList.toggle('on', vicio !== null);
+  document.getElementById('ponto').classList.toggle('on', vicio !== null || excluidos.size > 0);
   if(sel) sel.value = vicio ?? '';
 }
 sel.addEventListener('change',()=>{ vicio = sel.value || null; atualizarVicio(); });
-document.getElementById('btnLimparVicio').onclick = ()=>{ vicio=null; atualizarVicio(); sec.classList.remove('on'); };
+document.getElementById('listaExcluir').addEventListener('change', e=>{
+  if(e.target.checked) excluidos.add(e.target.value); else excluidos.delete(e.target.value);
+  atualizarVicio();
+});
+document.getElementById('btnLimparVicio').onclick = ()=>{
+  vicio = null; excluidos.clear(); atualizarVicio(); fecharSecreto();
+};
 document.addEventListener('keydown', e=>{
   if(e.altKey && e.shiftKey && e.code === 'KeyR'){
-    e.preventDefault(); preencherSelect(); sec.classList.toggle('on');
+    e.preventDefault(); sec.classList.contains('on') ? fecharSecreto() : abrirSecreto();
   } else if(e.key === 'Escape'){
-    sec.classList.remove('on'); document.getElementById('modal').classList.remove('on');
-  } else if(e.code === 'Space' && document.activeElement !== txt){
+    fecharSecreto(); document.getElementById('modal').classList.remove('on');
+  } else if(e.code === 'Space' && !sec.contains(document.activeElement) && document.activeElement !== txt){
     e.preventDefault(); girar();
   }
 });
