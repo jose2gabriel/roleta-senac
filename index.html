@@ -60,6 +60,8 @@
   label.chk{display:flex;gap:8px;align-items:center;font-size:13px;margin-top:12px;cursor:pointer}
   .hist{margin-top:14px;font-size:13px;max-height:90px;overflow:auto}
   .hist b{color:var(--laranja-esc)}
+  .limpar{background:none;color:#5a6b7d;font-size:12px;padding:6px 10px;border:1px solid #d3dde8}
+  .limpar:hover{background:var(--cinza);color:var(--azul)}
   /* modal vencedor */
   .modal{position:fixed;inset:0;background:rgba(0,20,45,.75);display:none;align-items:center;
     justify-content:center;z-index:10}
@@ -132,6 +134,10 @@ Heitor</textarea>
     </div>
     <label class="chk"><input type="checkbox" id="remover"> Remover sorteado da roleta</label>
     <div class="hist" id="hist"></div>
+    <div class="btns">
+      <button class="limpar" id="btnLimparRank">🗑️ Limpar ranking</button>
+      <button class="limpar" id="btnLimparRoleta">🗑️ Limpar roleta</button>
+    </div>
   </div>
 </main>
 
@@ -404,6 +410,15 @@ function fanfarra(){
 document.getElementById('btnGirar').onclick = girar;
 document.getElementById('btnCentro').onclick = girar;
 document.getElementById('btnEmbaralhar').onclick = embaralhar;
+// limpar vale pra todas as telas, por isso pede confirmação
+document.getElementById('btnLimparRank').onclick = ()=>{
+  if(girando || !historico.length || !confirm('Apagar o ranking de sorteados para todos?')) return;
+  historico = []; renderHist(); publicar();
+};
+document.getElementById('btnLimparRoleta').onclick = ()=>{
+  if(girando || !txt.value.trim() || !confirm('Apagar todos os nomes da roleta para todos?')) return;
+  txt.value = ''; lerNomes(); desenhar(); publicar(); txt.focus();
+};
 document.getElementById('btnFechar').onclick = ()=>document.getElementById('modal').classList.remove('on');
 let tEdicao;
 txt.addEventListener('input',()=>{
