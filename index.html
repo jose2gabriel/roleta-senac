@@ -6,18 +6,25 @@
 <title>Roleta Sorteadora Senac</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
+  :root, body[data-tema=senac]{
     --azul:#004A8D; --azul-esc:#00305C; --laranja:#F7941D; --laranja-esc:#D9770A;
-    --branco:#fff; --cinza:#EEF3F8;
+    --fundo1:#004A8D; --fundo2:#00305C;
   }
+  body[data-tema=escuro]{--azul:#1F2A37;--azul-esc:#111827;--laranja:#F7941D;--laranja-esc:#D9770A;
+    --fundo1:#1B2330;--fundo2:#05070A}
+  body[data-tema=natal]{--azul:#0F5A2A;--azul-esc:#0B3D2E;--laranja:#C62828;--laranja-esc:#9E1B1B;
+    --fundo1:#0F5A2A;--fundo2:#06261C}
+  body[data-tema=neon]{--azul:#5B1FA8;--azul-esc:#2A0A4A;--laranja:#FF2E93;--laranja-esc:#D6006F;
+    --fundo1:#3A0D6B;--fundo2:#12002A}
+  :root{--branco:#fff; --cinza:#EEF3F8}
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     font-family:'Montserrat',system-ui,sans-serif;
-    background:linear-gradient(160deg,var(--azul) 0%,var(--azul-esc) 100%);
+    background:linear-gradient(160deg,var(--fundo1) 0%,var(--fundo2) 100%);
     color:var(--branco); min-height:100vh;
     display:flex; flex-direction:column; align-items:center;
   }
-  header{width:100%;padding:18px 28px;display:flex;align-items:center;gap:14px;
+  header{width:100%;padding:18px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
     border-bottom:4px solid var(--laranja);background:rgba(0,0,0,.12)}
   .marca{font-weight:800;font-size:28px;letter-spacing:-1px}
   .marca span{color:var(--laranja)}
@@ -25,9 +32,9 @@
   .status{margin-left:auto;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;
     background:rgba(255,255,255,.12);white-space:nowrap}
   .status.on{background:rgba(46,204,113,.25)}
-  main{flex:1;width:100%;max-width:1150px;display:grid;grid-template-columns:1fr 340px;
+  main{flex:1;width:100%;max-width:1150px;display:grid;grid-template-columns:1fr 360px;
     gap:32px;padding:32px 24px;align-items:center}
-  @media(max-width:860px){main{grid-template-columns:1fr}}
+  @media(max-width:980px){main{grid-template-columns:1fr;justify-items:center} .painel{width:min(420px,100%)}}
   .roda-wrap{position:relative;display:flex;justify-content:center;align-items:center}
   canvas{width:min(560px,88vw);height:auto;aspect-ratio:1;border-radius:50%;
     box-shadow:0 0 0 10px var(--branco),0 0 0 16px var(--laranja),0 20px 60px rgba(0,0,0,.45)}
@@ -39,16 +46,8 @@
     font-weight:800;color:var(--azul);font-size:20px;cursor:pointer;user-select:none;
     box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .15s}
   .centro:hover{transform:scale(1.06)}
-  .painel{background:var(--branco);color:var(--azul-esc);border-radius:16px;padding:22px;
-    box-shadow:0 14px 40px rgba(0,0,0,.3)}
-  .painel h2{font-size:18px;margin-bottom:6px}
-  .painel small{color:#5a6b7d;display:block;margin-bottom:10px}
-  textarea{width:100%;height:230px;border:2px solid #d3dde8;border-radius:10px;padding:10px;
-    font-family:inherit;font-size:14px;resize:vertical;color:var(--azul-esc);
-    background:linear-gradient(180deg,#F3F7FC 0%,#E6EEF7 100%);line-height:1.6}
-  textarea:focus{outline:none;border-color:var(--laranja);background:#FFF8EF;
-    box-shadow:0 0 0 3px rgba(247,148,29,.2)}
-  .btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .painel{position:relative;background:var(--branco);color:var(--azul-esc);border-radius:18px;
+    box-shadow:0 14px 40px rgba(0,0,0,.3);display:flex;flex-direction:column}
   button{font-family:inherit;font-weight:700;border:none;border-radius:10px;padding:12px 16px;
     cursor:pointer;font-size:14px;transition:background .15s,transform .1s}
   button:active{transform:scale(.97)}
@@ -57,12 +56,124 @@
   .girar:disabled{background:#c9c9c9;cursor:not-allowed}
   .sec{background:var(--cinza);color:var(--azul)}
   .sec:hover{background:#dde7f1}
-  label.chk{display:flex;gap:8px;align-items:center;font-size:13px;margin-top:12px;cursor:pointer}
-  .hist{margin-top:14px;font-size:13px;max-height:90px;overflow:auto}
-  .hist b{color:var(--laranja-esc)}
-  .limpar{background:none;color:#5a6b7d;font-size:12px;padding:6px 10px;border:1px solid #d3dde8}
-  .limpar:hover{background:var(--cinza);color:var(--azul)}
-  /* modal vencedor */
+  /* abas */
+  .abas{display:flex;gap:2px;padding:8px 8px 0;border-bottom:2px solid #e3eaf2}
+  .aba{flex:1;background:none;color:#8a99a8;border-radius:12px 12px 0 0;padding:10px 2px 8px;font-size:22px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;
+    border-bottom:3px solid transparent;margin-bottom:-2px}
+  .aba span{font-size:11px;font-weight:700}
+  .aba i{position:absolute;top:4px;left:calc(50% + 6px);background:var(--laranja);color:#fff;font-style:normal;
+    font-size:10px;font-weight:800;border-radius:10px;padding:1px 6px}
+  .aba i:empty{display:none}
+  .aba:hover{color:var(--azul)}
+  .aba.on{color:var(--azul);background:var(--cinza);border-bottom-color:var(--laranja)}
+  .engrenagem{background:none;font-size:20px;padding:8px 10px;align-self:center;color:#8a99a8}
+  .engrenagem:hover{background:var(--cinza)}
+  .conteudo{height:340px;overflow:auto;padding:16px 18px}
+  .conteudo[hidden]{display:none}
+  /* adicionar + fichinhas */
+  .add{display:flex;gap:6px}
+  .add input{flex:1;min-width:0;padding:12px 14px;border:2px solid #d3dde8;border-radius:12px;
+    font-family:inherit;font-size:15px;color:var(--azul-esc)}
+  .add input:focus{outline:none;border-color:var(--laranja);box-shadow:0 0 0 3px rgba(247,148,29,.2)}
+  .add button{padding:0 14px;font-size:20px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--cinza);border-radius:30px;
+    padding:4px 4px 4px 4px;font-size:14px;font-weight:600;max-width:100%;animation:entra .25s ease-out}
+  .chip .av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:13px;font-weight:800;overflow:hidden;flex:none}
+  .chip .av img{width:100%;height:100%;object-fit:cover}
+  .chip .av.emo{background:#fff !important;font-size:17px}
+  .chip .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chip .x{background:none;padding:3px 7px;font-size:11px;color:#9aa8b6;border-radius:50%}
+  .chip .x:hover{background:#ffdede;color:#c62828}
+  @keyframes entra{from{transform:scale(.6);opacity:0}}
+  .vazio{text-align:center;color:#7a8a9b;padding:26px 10px;font-size:13px;line-height:1.5}
+  .vazio .ico{font-size:52px;display:block;margin-bottom:8px;animation:pula 2s ease-in-out infinite}
+  .vazio b{display:block;color:var(--azul-esc);font-size:15px;margin-bottom:2px}
+  textarea{width:100%;height:220px;border:2px solid #d3dde8;border-radius:10px;padding:10px;
+    font-family:inherit;font-size:14px;resize:vertical;color:var(--azul-esc);background:#F3F7FC;line-height:1.6}
+  textarea:focus{outline:none;border-color:var(--laranja);background:#FFF8EF}
+  .modoTexto{background:#FFF8EF;border:1px dashed var(--laranja);border-radius:10px;padding:8px 10px;
+    font-size:12px;margin:12px 0 8px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+  .modoTexto button{padding:6px 10px;font-size:12px}
+  code{background:#fff;padding:1px 4px;border-radius:4px;font-size:11px}
+  /* rodapé do painel: quantos + girar */
+  .acao{display:flex;gap:10px;padding:14px 16px;border-top:2px solid #e3eaf2}
+  .stepper{display:flex;align-items:center;background:var(--cinza);border-radius:12px}
+  .stepper button{background:none;color:var(--azul);font-size:22px;padding:6px 12px}
+  .stepper button:hover{background:#dde7f1}
+  .stepper div{text-align:center;min-width:58px;line-height:1.1}
+  .stepper b{font-size:22px;display:block;color:var(--azul)}
+  .stepper small{font-size:10px;color:#7a8a9b;font-weight:700}
+  .acao .girar{font-size:18px;padding:14px}
+  /* menus suspensos */
+  .pop{position:absolute;top:66px;right:10px;width:300px;max-width:calc(100% - 20px);background:#fff;
+    color:var(--azul-esc);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.35);padding:10px;z-index:6}
+  .pop[hidden]{display:none}
+  .pop .item{display:flex;gap:10px;width:100%;text-align:left;background:none;padding:10px;border-radius:8px;
+    font-size:14px;color:var(--azul-esc)}
+  .pop .item:hover{background:var(--cinza)}
+  .pop .perigo{color:#c62828}
+  .pop-tit{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#8a99a8;margin:8px 6px 6px}
+  .pop hr{border:none;border-top:1px solid #e3eaf2;margin:6px 0}
+  .linha{display:flex;gap:6px;align-items:center;padding:0 4px 4px}
+  .linha select{flex:1;min-width:0;padding:8px;border:2px solid #d3dde8;border-radius:8px;
+    font-family:inherit;color:var(--azul-esc);background:#fff}
+  .linha button{padding:8px 10px}
+  .sw{display:flex;align-items:center;gap:10px;padding:9px 6px;cursor:pointer;font-size:14px;font-weight:600}
+  .sw input{display:none}
+  .trilho{width:40px;height:22px;border-radius:11px;background:#cfd8e3;position:relative;flex:none;transition:background .2s}
+  .trilho::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+    background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .sw input:checked + .trilho{background:var(--laranja)}
+  .sw input:checked + .trilho::after{transform:translateX(18px)}
+  .temas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 4px 4px}
+  .tema{height:56px;border-radius:12px;padding:0 0 5px;color:#fff;font-size:11px;display:flex;
+    align-items:flex-end;justify-content:center;border:3px solid transparent;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  .tema.on{border-color:var(--azul-esc);box-shadow:inset 0 0 0 2px #fff}
+  /* equipes */
+  .grande{text-align:center;padding-top:6px}
+  .grande p{font-weight:700;font-size:15px;margin-bottom:12px}
+  .stepper.big{display:inline-flex;margin-bottom:18px}
+  .stepper.big b{font-size:36px}
+  .stepper.big button{font-size:28px;padding:10px 20px}
+  .prev{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:8px;min-height:30px}
+  .mini-eq{border:2px solid;border-radius:10px;padding:6px;display:flex;flex-wrap:wrap;gap:3px;
+    max-width:72px;justify-content:center;font-size:10px;font-weight:800}
+  .mini-eq i{width:10px;height:10px;border-radius:50%}
+  .prevTxt{font-size:13px;color:#7a8a9b;margin-bottom:16px}
+  .grande .girar{width:100%}
+  /* chave dos prêmios */
+  .interruptor{background:var(--cinza);border-radius:12px;padding:10px 12px;margin-bottom:12px}
+  .interruptor b{display:block;font-size:14px}
+  .interruptor small{display:block;color:#7a8a9b;font-size:12px;font-weight:600}
+  .premios-off .add,.premios-off .chips{opacity:.4;filter:grayscale(1)}
+  .aba i.off{background:#9aa8b6}
+  /* escolha da animação */
+  .anims{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 4px 4px}
+  .anim{background:var(--cinza);color:var(--azul-esc);padding:8px 2px;font-size:11px;border:2px solid transparent;
+    display:flex;flex-direction:column;align-items:center;gap:2px}
+  .anim span{font-size:20px}
+  .anim:hover{background:#dde7f1}
+  .anim.on{border-color:var(--laranja);background:#FFF3E3}
+  /* roda brilhando enquanto gira */
+  .roda-wrap.girando #roda{animation:brilhoRoda .7s ease-in-out infinite alternate}
+  @keyframes brilhoRoda{to{box-shadow:0 0 0 10px var(--branco),0 0 0 16px var(--laranja),0 0 60px 22px var(--laranja)}}
+  /* histórico */
+  .histAcoes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+  .histAcoes button{background:var(--cinza);color:var(--azul);padding:8px 2px;font-size:11px;
+    display:flex;flex-direction:column;align-items:center;gap:2px}
+  .histAcoes button span{font-size:18px}
+  .histAcoes button:hover{background:#dde7f1}
+  .histAcoes button:disabled{opacity:.4;cursor:default}
+  .h{display:flex;align-items:center;gap:10px;padding:7px 4px;border-bottom:1px solid #eef2f6}
+  .h .pos{width:34px;height:34px;border-radius:50%;background:var(--cinza);color:var(--azul);font-weight:800;
+    font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+  .h:first-child .pos{background:var(--laranja);color:#fff}
+  .h b{display:block;font-size:14px}
+  .h small{color:#7a8a9b;font-size:12px}
+  /* modal */
   .modal{position:fixed;inset:0;background:rgba(0,20,45,.75);display:none;align-items:center;
     justify-content:center;z-index:10}
   .modal.on{display:flex}
@@ -74,20 +185,61 @@
   .card{position:relative;background:#fff;color:var(--azul);border-radius:24px;padding:40px 60px;text-align:center;
     border-top:12px solid var(--laranja);animation:pop .6s cubic-bezier(.2,1.6,.4,1);max-width:90vw;
     box-shadow:0 0 0 6px rgba(255,255,255,.3),0 0 60px rgba(247,148,29,.8)}
+  .card.larga{padding:32px 36px;width:min(900px,92vw);max-height:88vh;overflow:auto}
   .card .trofeu{font-size:72px;line-height:1;animation:pula 1s ease-in-out infinite}
   .card h3{font-size:18px;text-transform:uppercase;letter-spacing:3px;color:var(--laranja-esc);margin-top:8px}
+  .card .foto{width:130px;height:130px;border-radius:50%;object-fit:cover;border:6px solid var(--laranja);
+    margin:14px auto 0;display:none;box-shadow:0 8px 20px rgba(0,0,0,.25)}
   .card .nome{font-size:clamp(40px,7vw,72px);font-weight:800;margin:10px 0 6px;word-break:break-word;
     background:linear-gradient(90deg,var(--azul),var(--laranja),var(--azul));background-size:200% auto;
     -webkit-background-clip:text;background-clip:text;color:transparent;
     animation:brilho 2s linear infinite, pulso 1.2s ease-in-out infinite}
-  .card .parabens{font-size:18px;color:#5a6b7d;margin-bottom:24px;font-weight:600}
+  .card .parabens{font-size:18px;color:#5a6b7d;margin-bottom:20px;font-weight:600}
+  .card .tarefa{font-size:22px;font-weight:700;color:var(--azul-esc);background:var(--cinza);border-radius:12px;
+    padding:10px 20px;margin:0 auto 22px;width:fit-content;max-width:100%;display:none}
+  .card .tarefa.ok{background:var(--laranja);color:#fff;animation:pulso 1s ease-in-out infinite}
+  .podio{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin:24px 0 18px}
+  .degrau{width:clamp(90px,20vw,190px);text-align:center}
+  .degrau .n{font-weight:800;font-size:clamp(16px,2.4vw,24px);word-break:break-word;margin-bottom:4px}
+  .degrau .tf{font-size:12px;color:#5a6b7d;margin-bottom:6px}
+  .degrau .bloco{background:var(--azul);color:#fff;border-radius:12px 12px 0 0;font-size:40px;
+    display:flex;justify-content:center;padding-top:12px}
+  .degrau.p1 .bloco{height:160px;background:var(--laranja)}
+  .degrau.p2 .bloco{height:115px}
+  .degrau.p3 .bloco{height:80px;background:var(--azul-esc)}
+  .resto{text-align:left;max-width:440px;margin:0 auto 20px;font-size:15px;line-height:1.7}
+  .resto b{color:var(--laranja-esc)}
+  .resto .tf{font-size:13px;color:#5a6b7d}
+  .equipes{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:20px 0 22px;text-align:left}
+  .equipe{border-radius:14px;padding:14px;color:#fff;box-shadow:0 6px 14px rgba(0,0,0,.15)}
+  .equipe h4{font-size:16px;margin-bottom:8px;border-bottom:2px solid rgba(255,255,255,.4);padding-bottom:6px}
+  .equipe div{font-weight:600;padding:2px 0}
   @keyframes pop{0%{transform:scale(.2) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
   @keyframes pula{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-14px) rotate(6deg)}}
   @keyframes brilho{to{background-position:200% center}}
   @keyframes pulso{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
   /* painel secreto */
-  .secreto{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,.85);color:#fff;
-    padding:14px;border-radius:10px;font-size:13px;display:none;z-index:20;width:240px}
+  .secreto{position:fixed;bottom:16px;right:16px;background:rgba(0,0,0,.88);color:#fff;
+    padding:14px;border-radius:12px;font-size:13px;display:none;z-index:20;width:320px;max-height:85vh;overflow:auto}
+  .sec-topo{display:flex;justify-content:space-between;align-items:center}
+  .sec-x{background:none;color:#fff;padding:2px 8px;font-size:12px;opacity:.6}
+  .sec-abas{display:flex;gap:3px;margin:10px 0 8px}
+  .sec-abas button{flex:1;background:rgba(255,255,255,.08);color:#fff;padding:6px 2px;font-size:16px;
+    display:flex;flex-direction:column;align-items:center;gap:1px;border-radius:8px}
+  .sec-abas button span{font-size:9px;font-weight:700;opacity:.85}
+  .sec-abas button.on{background:var(--laranja)}
+  .secreto small{display:block;opacity:.7;font-size:11px;margin-bottom:6px;line-height:1.4}
+  .sec-linha{display:flex;gap:4px}
+  .secreto .sec-linha select{margin:0 0 6px;min-width:0;flex:1;width:auto}
+  .sec-linha button{padding:4px 10px;margin-bottom:6px;background:var(--laranja);color:#fff}
+  .secreto .lista .row{display:flex;align-items:center;gap:6px;padding:3px 2px}
+  .row .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .secreto .row select{width:auto;margin:0;padding:2px 4px}
+  .row em{font-style:normal;opacity:.7;font-size:11px;width:34px;text-align:right}
+  .row .rx{background:none;color:#ff8a80;padding:0 6px;font-size:12px}
+  .secreto .row label{display:flex;gap:3px;align-items:center;font-size:11px;padding:0}
+  .sec-resumo{font-size:11px;background:rgba(255,255,255,.08);border-radius:6px;padding:6px 8px;margin:6px 0 8px;line-height:1.6}
+  #btnLimparVicio{width:100%;padding:8px}
   .secreto.on{display:block}
   .secreto select,.secreto input[type=password]{width:100%;margin:8px 0;padding:6px;border-radius:6px;
     font-family:inherit;border:none}
@@ -98,12 +250,16 @@
   .ponto{position:fixed;bottom:6px;left:6px;width:5px;height:5px;border-radius:50%;
     background:rgba(255,255,255,.25);display:none}
   .ponto.on{display:block}
+  .aviso{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;
+    padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s;
+    z-index:30;pointer-events:none}
+  .aviso.on{opacity:1}
   footer{font-size:12px;opacity:.6;padding:12px}
   canvas.confete{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;
     box-shadow:none;border-radius:0;aspect-ratio:auto;z-index:11}
 </style>
 </head>
-<body>
+<body data-tema="senac">
 <header>
   <div class="marca">Senac<span>.</span></div>
   <p>Roleta Sorteadora</p>
@@ -118,9 +274,26 @@
   </div>
 
   <div class="painel">
-    <h2>Participantes</h2>
-    <small>Um nome por linha</small>
-    <textarea id="nomes">Ana
+    <nav class="abas">
+      <button class="aba on" data-aba="nomes" title="Quem participa">👥<span>Nomes</span><i id="cNomes"></i></button>
+      <button class="aba" data-aba="premios" title="Tarefas ou prêmios para os vencedores">🎁<span>Prêmios</span><i id="cPremios"></i></button>
+      <button class="aba" data-aba="equipes" title="Dividir a turma em equipes">🧩<span>Equipes</span></button>
+      <button class="aba" data-aba="hist" title="Quem já foi sorteado">📜<span>Histórico</span><i id="cHist"></i></button>
+      <button class="engrenagem" data-pop="popConfig" title="Configurações">⚙️</button>
+    </nav>
+
+    <!-- 👥 nomes -->
+    <section class="conteudo" data-aba="nomes">
+      <div class="add">
+        <input id="novoNome" placeholder="Digite um nome e aperte Enter" autocomplete="off">
+        <button class="girar" id="btnAddNome" title="Adicionar" style="flex:none">＋</button>
+        <button class="sec" data-pop="popMais" title="Mais opções" style="padding:0 12px">⋯</button>
+      </div>
+      <div class="chips" id="chipsNomes"></div>
+      <div id="areaTexto" hidden>
+        <div class="modoTexto"><span>✏️ Um nome por linha · foto: <code>Ana | link-da-foto</code></span>
+          <button class="girar" id="btnTextoPronto" style="flex:none">Pronto</button></div>
+        <textarea id="nomes">Ana
 Bruno
 Carla
 Diego
@@ -128,15 +301,80 @@ Eduarda
 Felipe
 Gabriela
 Heitor</textarea>
-    <div class="btns">
-      <button class="girar" id="btnGirar">🎯 Girar roleta</button>
-      <button class="sec" id="btnEmbaralhar">Embaralhar</button>
+      </div>
+    </section>
+
+    <!-- 🎁 prêmios -->
+    <section class="conteudo" data-aba="premios" id="secPremios" hidden>
+      <label class="sw interruptor"><input type="checkbox" id="chkPremios" checked><span class="trilho"></span>
+        <span><b id="premiosTit">Prêmios ligados</b><small id="premiosSub">Cada vencedor ganha um prêmio ao acaso</small></span></label>
+      <div class="add">
+        <input id="novoPremio" placeholder="Ex.: Ganhou um bombom 🍫" autocomplete="off">
+        <button class="girar" id="btnAddPremio" title="Adicionar" style="flex:none">＋</button>
+      </div>
+      <div class="chips" id="chipsPremios"></div>
+      <textarea id="tarefas" hidden></textarea>
+    </section>
+
+    <!-- 🧩 equipes -->
+    <section class="conteudo" data-aba="equipes" hidden>
+      <div class="grande">
+        <p>Em quantas equipes?</p>
+        <div class="stepper big">
+          <button id="eMenos">−</button><div><b id="eTxt">2</b><small>equipes</small></div><button id="eMais">+</button>
+        </div>
+        <div class="prev" id="prevEquipes"></div>
+        <div class="prevTxt" id="prevTxt"></div>
+        <button class="girar" id="btnEquipes">🧩 Sortear equipes</button>
+      </div>
+    </section>
+
+    <!-- 📜 histórico -->
+    <section class="conteudo" data-aba="hist" hidden>
+      <div class="histAcoes">
+        <button id="btnDesfazer" title="Desfaz o último giro ou limpeza"><span>↩️</span>Desfazer</button>
+        <button id="btnCSV" title="Baixar planilha (Excel)"><span>📊</span>Planilha</button>
+        <button id="btnCopiar" title="Copiar como texto"><span>📋</span>Copiar</button>
+        <button id="btnLimparRank" title="Apagar o histórico"><span>🗑️</span>Limpar</button>
+      </div>
+      <div id="hist"></div>
+    </section>
+
+    <div class="acao">
+      <div class="stepper" title="Quantas pessoas sortear de uma vez">
+        <button id="qMenos">−</button><div><b id="qTxt">1</b><small id="qLbl">vencedor</small></div><button id="qMais">+</button>
+      </div>
+      <button class="girar" id="btnGirar">🎯 Girar!</button>
     </div>
-    <label class="chk"><input type="checkbox" id="remover"> Remover sorteado da roleta</label>
-    <div class="hist" id="hist"></div>
-    <div class="btns">
-      <button class="limpar" id="btnLimparRank">🗑️ Limpar ranking</button>
-      <button class="limpar" id="btnLimparRoleta">🗑️ Limpar roleta</button>
+
+    <!-- menu ⋯ dos nomes -->
+    <div class="pop" id="popMais" hidden>
+      <button class="item" id="btnImportar">📂 Importar do Excel / arquivo</button>
+      <button class="item" id="btnTexto">✏️ Editar como texto</button>
+      <button class="item" id="btnEmbaralhar">🔀 Embaralhar a ordem</button>
+      <button class="item" id="btnRepetidos">🧹 Tirar nomes repetidos</button>
+      <button class="item perigo" id="btnLimparRoleta">🗑️ Apagar todos os nomes</button>
+      <hr>
+      <div class="pop-tit">📚 Minhas turmas salvas</div>
+      <div class="linha">
+        <select id="selListas"></select>
+        <button class="sec" id="btnSalvarLista" title="Salvar a lista atual">💾</button>
+        <button class="sec" id="btnExcluirLista" title="Excluir a lista selecionada">🗑️</button>
+      </div>
+    </div>
+    <input type="file" id="arquivo" accept=".txt,.csv,text/plain,text/csv" hidden>
+
+    <!-- menu ⚙️ -->
+    <div class="pop" id="popConfig" hidden>
+      <div class="pop-tit">⚙️ Como sortear</div>
+      <label class="sw"><input type="checkbox" id="remover"><span class="trilho"></span>🚪 Quem ganhar sai da roleta</label>
+      <label class="sw"><input type="checkbox" id="chkSom"><span class="trilho"></span>🔊 Sons</label>
+      <hr>
+      <div class="pop-tit">🎬 Animação do giro</div>
+      <div class="anims" id="anims"></div>
+      <hr>
+      <div class="pop-tit">🎨 Tema</div>
+      <div class="temas" id="temas"></div>
     </div>
   </div>
 </main>
@@ -144,64 +382,233 @@ Heitor</textarea>
 <footer>Roleta ilustrativa · tema Senac</footer>
 
 <div class="modal" id="modal">
-  <div class="card">
-    <div class="trofeu">🏆</div>
-    <h3>🎉 Temos um(a) vencedor(a)! 🎉</h3>
-    <div class="nome" id="nomeVencedor"></div>
-    <div class="parabens">Parabéns! Você foi sorteado(a) na Roleta Senac!</div>
+  <div class="card" id="card">
+    <div id="vVencedor">
+      <div class="trofeu" id="trofeu">🏆</div>
+      <h3>🎉 Temos um(a) vencedor(a)! 🎉</h3>
+      <img class="foto" id="fotoVencedor" alt="">
+      <div class="nome" id="nomeVencedor"></div>
+      <div class="parabens" id="parabens"></div>
+      <div class="tarefa" id="tarefaVencedor"></div>
+    </div>
+    <div id="vPodio" style="display:none">
+      <h3>🏆 Pódio do sorteio 🏆</h3>
+      <div class="podio" id="podio"></div>
+      <div class="resto" id="resto"></div>
+    </div>
+    <div id="vEquipes" style="display:none">
+      <h3>👥 Equipes sorteadas</h3>
+      <div class="equipes" id="equipes"></div>
+    </div>
     <button class="girar" id="btnFechar">Fechar</button>
   </div>
 </div>
 
 <div class="secreto" id="secreto">
-  <b>Modo viciado</b><br>
+  <div class="sec-topo"><b>🎭 Modo viciado</b><button class="sec-x" id="btnFecharSecreto" title="Fechar">✕</button></div>
   <div id="travado">
     <input type="password" id="senha" inputmode="numeric" placeholder="Senha" autocomplete="off">
     <div class="erro" id="senhaErro">Senha incorreta</div>
   </div>
   <div id="liberado" style="display:none">
-    Próximo vencedor:
-    <select id="selVicio"></select>
-    Nunca sortear:
-    <div class="lista" id="listaExcluir"></div>
-    <button class="sec" id="btnLimparVicio" style="width:100%;padding:8px">Desligar tudo</button>
+    <div class="sec-abas" id="secAbas">
+      <button data-s="fila" class="on" title="Próximos vencedores">🎯<span>Fila</span></button>
+      <button data-s="isca" title="Onde a roda quase para">🪝<span>Isca</span></button>
+      <button data-s="chances" title="Chance de cada um">⚖️<span>Chances</span></button>
+      <button data-s="equipes" title="Equipes combinadas">🧩<span>Equipes</span></button>
+      <button data-s="nunca" title="Nunca sortear">🚫<span>Nunca</span></button>
+    </div>
+    <div class="sec-pag" data-s="fila">
+      <small>Os próximos giros tiram estas pessoas, na ordem (e com o prêmio escolhido).</small>
+      <div class="sec-linha"><select id="filaNome"></select><select id="filaPremio"></select><button id="filaAdd">＋</button></div>
+      <div class="lista" id="filaLista"></div>
+    </div>
+    <div class="sec-pag" data-s="isca" hidden>
+      <small>No próximo giro a roda quase para nesta pessoa… e escorrega até o vencedor.</small>
+      <select id="selIsca"></select>
+    </div>
+    <div class="sec-pag" data-s="chances" hidden>
+      <small>Muda a chance escondido — a fatia na roda continua do mesmo tamanho.</small>
+      <div class="lista" id="listaChances"></div>
+    </div>
+    <div class="sec-pag" data-s="equipes" hidden>
+      <small>Juntos = caem na mesma equipe · Separados = cada um numa equipe diferente.</small>
+      <div class="lista" id="listaEquipes"></div>
+    </div>
+    <div class="sec-pag" data-s="nunca" hidden>
+      <small>Estas pessoas nunca são sorteadas.</small>
+      <div class="lista" id="listaExcluir"></div>
+    </div>
+    <div class="sec-resumo" id="secResumo"></div>
+    <button class="sec" id="btnLimparVicio">Desligar tudo</button>
   </div>
   <div style="opacity:.6;margin-top:8px;font-size:11px">Alt+Shift+R abre/fecha · Esc fecha</div>
 </div>
 <div class="ponto" id="ponto"></div>
+<div class="aviso" id="aviso"></div>
 <canvas class="confete" id="confete"></canvas>
 
 <script src="https://unpkg.com/mqtt@5.16.1/dist/mqtt.min.js"></script>
 <script>
-const cv = document.getElementById('roda'), ctx = cv.getContext('2d');
-const txt = document.getElementById('nomes');
-const cores = ['#004A8D','#F7941D','#0A66B8','#FFB347','#00305C','#E8850F'];
-const chkRemover = document.getElementById('remover');
-let itens = [], angulo = 0, girando = false, vicio = null; // vicio = nome forçado
-const excluidos = new Set(); // nomes que nunca são sorteados (só nesta tela)
-let historico = [];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const ler = k => { try{ return localStorage.getItem(k); }catch(e){ return null; } };
+const gravar = (k,v) => { try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } };
+const sortear = arr => arr[Math.floor(Math.random()*arr.length)];
+function embaralharArr(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
-function lerNomes(){ itens = txt.value.split('\n').map(s=>s.trim()).filter(Boolean); }
+const cv = $('roda'), ctx = cv.getContext('2d');
+const txt = $('nomes'), txtTarefas = $('tarefas');
+const chkRemover = $('remover'), chkPremios = $('chkPremios');
+
+/* ---- sincronização (constantes) ---- */
+// sala pelo endereço: .../roleta-senac/#turma2 → sala "turma2"; sem # → "principal"
+const SALA = decodeURIComponent(location.hash.slice(1)) || 'principal';
+const TOPICO = 'jose2gabriel/roleta-senac/v1/' + SALA;
+const EU = Math.random().toString(36).slice(2, 10);
+let cliente = null, giroAtual = null;
+
+/* ---- temas ---- */
+const TEMAS = {
+  senac:  { nome:'Senac',   trofeu:'🏆', roda:['#004A8D','#F7941D','#0A66B8','#FFB347','#00305C','#E8850F'],
+            festa:['#F7941D','#004A8D','#ffffff','#FFB347','#FFD54A','#0A66B8'] },
+  escuro: { nome:'Escuro',  trofeu:'🏆', roda:['#1F2937','#F7941D','#374151','#D9770A','#111827','#4B5563'],
+            festa:['#F7941D','#ffffff','#9CA3AF','#FFD54A'] },
+  natal:  { nome:'Natal 🎄', trofeu:'🎅', roda:['#C62828','#1B7F3B','#B8860B','#8E1B1B','#0F5A2A','#D4A017'],
+            festa:['#C62828','#1B7F3B','#ffffff','#FFD54A'] },
+  neon:   { nome:'Neon',    trofeu:'🏆', roda:['#7B2FF7','#FF2E93','#0093A0','#5B1FA8','#D6006F','#00A3B4'],
+            festa:['#FF2E93','#7B2FF7','#00E5FF','#ffffff','#FFD54A'] },
+};
+let tema = 'senac', cores = TEMAS.senac.roda;
+$('temas').innerHTML = Object.entries(TEMAS).map(([k,v])=>
+  `<button class="tema" data-tema="${k}" style="background:linear-gradient(135deg,${v.roda[0]} 50%,${v.roda[1]} 50%)">${v.nome}</button>`).join('');
+function aplicarTema(t){
+  tema = TEMAS[t] ? t : 'senac';
+  document.body.dataset.tema = tema; cores = TEMAS[tema].roda;
+  document.querySelectorAll('.tema').forEach(b=>b.classList.toggle('on', b.dataset.tema === tema));
+  gravar('roleta-senac-tema', tema);
+  desenhar(); renderChipsNomes();
+}
+$('temas').onclick = e=>{ const b = e.target.closest('.tema'); if(b) aplicarTema(b.dataset.tema); };
+
+/* ---- participantes: "Nome" ou "Nome | https://foto" ---- */
+let itens = [], fotos = {}, angulo = 0, girando = false;
+// modo viciado (vale só nesta tela, que é quem decide o giro)
+const excluidos = new Set();          // nunca são sorteados
+const fila = [];                      // [{nome, premio}] próximos vencedores, em ordem
+let isca = null;                      // nome onde a roda quase para no próximo giro
+const pesos = new Map();              // nome → peso da chance (sem entrada = 1)
+const juntos = new Set(), separados = new Set(); // combinação das equipes
+let historico = []; // [{nome, tarefa, quando}], mais recente primeiro
+const norm = h => typeof h === 'string' ? { nome:h } : h;
+
+function parseLinha(l){
+  const k = l.indexOf('|');
+  if(k < 0) return { nome:l.trim(), foto:null };
+  const f = l.slice(k+1).trim();
+  return { nome:l.slice(0,k).trim(), foto:/^https?:\/\//i.test(f) ? f : null };
+}
+function lerNomes(){
+  itens = []; fotos = {};
+  for(const l of txt.value.split('\n')){
+    const p = parseLinha(l); if(!p.nome) continue;
+    itens.push(p.nome); if(p.foto) fotos[p.nome] = p.foto;
+  }
+  renderChipsNomes();
+}
+const lerTarefas = () => txtTarefas.value.split('\n').map(s=>s.trim()).filter(Boolean);
+
+/* ---- fichinhas (nomes e prêmios) ---- */
+const vazio = (ico, tit, txt) => `<div class="vazio" style="width:100%"><span class="ico">${ico}</span><b>${tit}</b>${txt}</div>`;
+const EMOJI = /\p{Extended_Pictographic}/u;
+function avatar(n, i){
+  if(fotos[n]) return `<span class="av"><img src="${esc(fotos[n])}" alt=""></span>`;
+  const em = Array.from(n).find(c=>EMOJI.test(c));
+  if(em) return `<span class="av emo">${em}</span>`;
+  return `<span class="av" style="background:${cores[i % cores.length]}">${esc((Array.from(n)[0]||'?').toUpperCase())}</span>`;
+}
+function renderChipsNomes(){
+  $('cNomes').textContent = itens.length || '';
+  $('chipsNomes').innerHTML = itens.length ? itens.map((n,i)=>`<span class="chip">${avatar(n,i)}<span class="tx">${
+      esc(n)}</span><button class="x" data-i="${i}" title="Tirar ${esc(n)}">✕</button></span>`).join('')
+    : vazio('🎡', 'A roleta está vazia', 'Digite os nomes acima, um de cada vez,<br>ou importe uma lista pelo botão ⋯');
+  if(typeof atualizarQtd === 'function') atualizarQtd();
+}
+function renderPremios(){
+  const l = lerTarefas(), on = chkPremios.checked;
+  $('cPremios').textContent = on ? (l.length || '') : 'off';
+  $('cPremios').classList.toggle('off', !on);
+  $('secPremios').classList.toggle('premios-off', !on);
+  $('premiosTit').textContent = on ? 'Prêmios ligados' : 'Prêmios desligados';
+  $('premiosSub').textContent = on ? 'Cada vencedor ganha um prêmio ao acaso' : 'A lista fica guardada, mas ninguém ganha prêmio';
+  $('chipsPremios').innerHTML = l.length ? l.map((t,i)=>`<span class="chip"><span class="av emo">🎁</span><span class="tx">${
+      esc(t)}</span><button class="x" data-i="${i}" title="Tirar">✕</button></span>`).join('')
+    : vazio('🎁', 'Sem prêmios por enquanto', 'É opcional: adicione tarefas ou prêmios<br>e cada vencedor ganha um ao acaso.');
+}
+const linhasNomes = () => txt.value.split('\n').filter(l=>parseLinha(l).nome);
+function addNomes(lista){
+  lista = lista.map(s=>s.trim()).filter(Boolean); if(!lista.length) return;
+  const atuais = linhasNomes(), tudo = semRepetidos([...atuais, ...lista]), novos = tudo.length - atuais.length;
+  if(!novos){ aviso(lista.length > 1 ? 'Esses nomes já estão na roleta' : 'Esse nome já está na roleta'); return; }
+  if(aplicarNomes(tudo.join('\n')) && lista.length > 1) aviso(`${novos} nomes adicionados 👥`);
+}
+function addPremios(lista){
+  lista = lista.map(s=>s.trim()).filter(Boolean); if(!lista.length) return;
+  txtTarefas.value = [...lerTarefas(), ...lista].join('\n'); renderPremios(); publicar();
+}
+// campo de digitar: Enter adiciona; colar várias linhas (ou do Excel) adiciona todas
+function ligarCampo(inp, btn, add){
+  const ir = ()=>{ add([inp.value]); inp.value = ''; inp.focus(); };
+  inp.addEventListener('keydown', e=>{ if(e.key === 'Enter'){ e.preventDefault(); ir(); } });
+  btn.onclick = ir;
+  inp.addEventListener('paste', e=>{
+    const t = e.clipboardData.getData('text'); if(!/[\n\t]/.test(t)) return;
+    e.preventDefault(); add(t.split(/\r?\n/).map(l=>primeiraColuna(l, '\t')));
+  });
+}
+
+const imgs = {};
+function imagem(url){
+  let im = imgs[url];
+  if(!im){
+    im = imgs[url] = new Image();
+    im.onload = ()=>{ if(!girando) desenhar(); };
+    im.onerror = ()=>{ im.falhou = true; };
+    im.src = url;
+  }
+  return im.complete && im.naturalWidth && !im.falhou ? im : null;
+}
 
 function desenhar(){
   const W = cv.width, R = W/2, n = itens.length;
   ctx.clearRect(0,0,W,W);
   if(!n){ ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(R,R,R,0,7);ctx.fill();return; }
   const fatia = 2*Math.PI/n;
+  const fs = Math.max(18, Math.min(46, 420/n + 14));
+  const ph = Math.min(120, (R-110)*fatia*0.8); // diâmetro da foto na fatia
   for(let i=0;i<n;i++){
     const a0 = angulo + i*fatia - Math.PI/2;
     ctx.beginPath(); ctx.moveTo(R,R); ctx.arc(R,R,R,a0,a0+fatia); ctx.closePath();
-    ctx.fillStyle = cores[i % cores.length];
-    if(n % cores.length === 1 && i === n-1) ctx.fillStyle = cores[2];
-    ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=3; ctx.stroke();
+    let c = cores[i % cores.length];
+    if(n % cores.length === 1 && i === n-1) c = cores[2]; // evita duas fatias iguais coladas
+    ctx.fillStyle = c; ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=3; ctx.stroke();
     ctx.save(); ctx.translate(R,R); ctx.rotate(a0+fatia/2);
+    let xTexto = R-40;
+    const url = fotos[itens[i]], im = url && ph >= 28 ? imagem(url) : null;
+    if(im){
+      const cx = R-30-ph/2, s = Math.min(im.naturalWidth, im.naturalHeight);
+      ctx.save(); ctx.beginPath(); ctx.arc(cx,0,ph/2,0,7); ctx.clip();
+      ctx.drawImage(im,(im.naturalWidth-s)/2,(im.naturalHeight-s)/2,s,s,cx-ph/2,-ph/2,ph,ph);
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(cx,0,ph/2,0,7); ctx.strokeStyle='#fff'; ctx.lineWidth=4; ctx.stroke();
+      xTexto = R-40-ph;
+    }
     ctx.textAlign='right'; ctx.textBaseline='middle';
-    const fs = Math.max(18, Math.min(46, 420/n + 14));
     ctx.font = `700 ${fs}px Montserrat, sans-serif`;
-    const claro = ['#F7941D','#FFB347','#E8850F'].includes(ctx.fillStyle.toUpperCase());
     ctx.fillStyle = '#fff';
-    let t = itens[i]; if(t.length>18) t = t.slice(0,17)+'…';
-    ctx.fillText(t, R-40, 0); ctx.restore();
+    const ch = Array.from(itens[i]);
+    const t = ch.length > 18 ? ch.slice(0,17).join('')+'…' : itens[i];
+    ctx.fillText(t, xTexto, 0, Math.max(60, xTexto-100)); ctx.restore();
   }
 }
 
@@ -212,87 +619,458 @@ function indiceEm(ang){
   return Math.floor(rel / fatia) % n;
 }
 
-function girar(){
+/* ---- som ---- */
+let ac = null, somOn = ler('roleta-senac-som') !== 'off', ultimoTic = 0;
+function audio(){
+  if(!somOn) return null;
+  const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+  try{ if(!ac) ac = new AC(); if(ac.state === 'suspended') ac.resume(); }catch(e){ return null; }
+  return ac;
+}
+// navegadores só liberam o áudio depois de um clique/tecla
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev, ()=>audio()));
+function atualizarSom(){ $('chkSom').checked = somOn; }
+$('chkSom').onchange = ()=>{ somOn = $('chkSom').checked; gravar('roleta-senac-som', somOn?'on':'off'); if(somOn) tic(); };
+function tic(){
+  const a = audio(); if(!a) return;
+  const t = a.currentTime; if(t - ultimoTic < 0.03) return; ultimoTic = t;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = 'square'; o.frequency.value = 1500; o.connect(g); g.connect(a.destination);
+  g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.03);
+  o.start(t); o.stop(t+0.04);
+}
+function fanfarra(curta){
+  const a = audio(); if(!a) return;
+  const notas = curta ? [[784,0],[1047,.12]] : [[523,0],[659,.15],[784,.3],[1047,.45],[784,.7],[1047,.85]];
+  notas.forEach(([fq,t],i)=>{
+    const o = a.createOscillator(), gn = a.createGain();
+    o.type='triangle'; o.frequency.value=fq; o.connect(gn); gn.connect(a.destination);
+    const ini = a.currentTime+t, dur = i===notas.length-1 ? (curta?.4:.9) : .18;
+    gn.gain.setValueAtTime(0,ini); gn.gain.linearRampToValueAtTime(.25,ini+.02);
+    gn.gain.exponentialRampToValueAtTime(.001,ini+dur); o.start(ini); o.stop(ini+dur+.05);
+  });
+}
+
+/* ---- animações do giro ---- */
+const ANIMS = {
+  surpresa: { ico:'🎲', nome:'Aleatória' },
+  classica: { ico:'🎯', nome:'Clássica' },
+  suspense: { ico:'🥁', nome:'Suspense' },
+  elastica: { ico:'🪀', nome:'Elástica' },
+  turbo:    { ico:'🚀', nome:'Turbo' },
+  degraus:  { ico:'👣', nome:'Degraus' },
+};
+let ultimaAnim = null;
+let animEscolhida = ANIMS[ler('roleta-senac-anim')] ? ler('roleta-senac-anim') : 'surpresa';
+$('anims').innerHTML = Object.entries(ANIMS).map(([k,v])=>`<button class="anim" data-anim="${k}"><span>${v.ico}</span>${v.nome}</button>`).join('');
+function marcarAnim(){ document.querySelectorAll('.anim').forEach(b=>b.classList.toggle('on', b.dataset.anim === animEscolhida)); }
+$('anims').onclick = e=>{
+  const b = e.target.closest('.anim'); if(!b) return;
+  animEscolhida = b.dataset.anim; gravar('roleta-senac-anim', animEscolhida); marcarAnim();
+  aviso(`${ANIMS[animEscolhida].ico} Animação: ${ANIMS[animEscolhida].nome}`);
+};
+marcarAnim();
+
+const easeOut = (p,k) => 1 - Math.pow(1-p, k);
+const inOut3 = p => p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2;
+const outBack = p => { const c = 2.2; return 1 + (c+1)*Math.pow(p-1,3) + c*Math.pow(p-1,2); };
+// devolve a duração e uma função tempo → ângulo. O giro anda no sentido negativo (de > para).
+function planoAnim(g, fatia){
+  const de = g.de, para = g.para;
+  switch(g.anim){
+    case 'suspense': if(g.quase != null){ // quase para na vizinha e escorrega
+      const q = g.quase, D1 = 4600, D2 = g.d2 || 1800;
+      return { dur:D1+D2, f:el => el < D1 ? de + (q-de)*easeOut(el/D1,4) : q + (para-q)*inOut3((el-D1)/D2) };
+    } break;
+    case 'elastica': { // passa do vencedor e volta balançando como mola
+      const ov = fatia*0.75, alvo = para - ov, D1 = 4300, D2 = 1600;
+      return { dur:D1+D2, f:el => {
+        if(el < D1) return de + (alvo-de)*easeOut(el/D1,3);
+        const u = (el-D1)/D2; return para - ov*(1-u)*Math.exp(-3*u)*Math.cos(3*Math.PI*u);
+      }};
+    }
+    case 'turbo': { // puxa pra trás, dispara e freia forte
+      const volta = 0.55, D0 = 750, D1 = 3600;
+      return { dur:D0+D1, f:el => el < D0 ? de + volta*inOut3(el/D0)
+                                         : (de+volta) + (para-de-volta)*(1 - Math.pow(2, -10*(el-D0)/D1)) / (1 - Math.pow(2,-10)) };
+    }
+    case 'degraus': { // desacelera e anda as últimas fatias uma de cada vez, "clac, clac, clac"
+      const k = g.passos || 4, base = para + k*fatia, D1 = 3600;
+      const tempos = Array.from({length:k}, (_,j)=>320 + j*170); // cada passo mais lento
+      const dur = D1 + tempos.reduce((a,b)=>a+b, 0);
+      return { dur, f:el => {
+        if(el < D1) return de + (base-de)*easeOut(el/D1,3);
+        let t = el - D1;
+        for(let j=0;j<k;j++){
+          const d = tempos[j], de2 = base - j*fatia;
+          if(t <= d || j === k-1){ const p = Math.min(1, t/(d*0.55)); return de2 - fatia*outBack(p); }
+          t -= d;
+        }
+        return para;
+      }};
+    }
+  }
+  return { dur:5200, f:el => de + (para-de)*easeOut(el/5200,4) }; // clássica
+}
+const seta = document.querySelector('.seta'); let ultimaBatida = 0;
+function bateSeta(){
+  const t = performance.now(); if(t - ultimaBatida < 70 || !seta.animate) return; ultimaBatida = t;
+  seta.animate([{ transform:'translateX(-50%) rotate(-22deg)' }, { transform:'translateX(-50%) rotate(0)' }],
+               { duration:160, easing:'ease-out' });
+}
+function pararEfeitos(){ cv.style.transform = ''; document.querySelector('.roda-wrap').classList.remove('girando'); }
+
+/* ---- giro ---- */
+let seqTimer = null;
+// índices que podem ganhar: nem excluídos nem já sorteados nesta sequência
+// sorteio que respeita as chances do modo viciado
+function sortearComPeso(idx){
+  const w = idx.map(i=>pesos.get(itens[i]) ?? 1), total = w.reduce((a,b)=>a+b, 0);
+  let r = Math.random()*total;
+  for(let j=0;j<idx.length;j++){ r -= w[j]; if(r < 0) return idx[j]; }
+  return idx[idx.length-1];
+}
+function elegiveis(ja){
+  const idx = itens.map((_,i)=>i).filter(i=>!ja.includes(itens[i]));
+  const livres = idx.filter(i=>!excluidos.has(itens[i]));
+  return livres.length ? livres : idx;
+}
+
+// seq = sequência em andamento (vários vencedores); vazio = giro novo
+function girar(seq){
   if(girando) return;
+  if(!seq) clearTimeout(seqTimer);
   lerNomes(); if(itens.length < 2){ desenhar(); return; }
   const n = itens.length, fatia = 2*Math.PI/n;
-  let alvo;
-  let iv = vicio !== null ? itens.indexOf(vicio) : -1;
-  if(iv < 0 && excluidos.size){
-    // sorteia só entre quem não está excluído (se sobrar alguém)
-    const pode = itens.map((_,i)=>i).filter(i=>!excluidos.has(itens[i]));
-    if(pode.length) iv = pode[Math.floor(Math.random()*pode.length)];
+  const ja = seq ? seq.lista.map(x=>x.nome) : [];
+  let total = seq ? seq.total : qtd;
+  if(!seq){
+    const livres = itens.filter(x=>!excluidos.has(x)).length || n;
+    total = Math.max(1, Math.min(total, livres, chkRemover.checked ? n-1 : n));
   }
-  if(iv >= 0){
-    // posição dentro da fatia escolhida, com folga pra não cair na borda
-    const dentro = fatia*(0.2 + Math.random()*0.6);
-    alvo = -(iv*fatia + dentro);
-  } else {
-    alvo = -Math.random()*2*Math.PI;
+  // modo viciado: primeiro quem está na fila (quem saiu da roleta é pulado)
+  let iv = -1, daFila = null;
+  while(fila.length){
+    const f = fila[0], k = itens.indexOf(f.nome);
+    if(k >= 0 && !ja.includes(f.nome)){ iv = k; daFila = f; break; }
+    fila.shift();
   }
+  if(iv < 0){
+    const pode = elegiveis(ja);
+    if(!pode.length){ if(seq) mostrarPodio(seq.lista); return; }
+    iv = sortearComPeso(pode);
+  }
+  // posição dentro da fatia escolhida, com folga pra não cair na borda
+  const dentro = fatia*(0.2 + Math.random()*0.6);
+  const alvo = -(iv*fatia + dentro);
   // normaliza e adiciona voltas
   const voltas = 6 + Math.floor(Math.random()*3);
   const atualNorm = angulo % (2*Math.PI);
   let delta = (alvo - atualNorm) % (2*Math.PI);
   if(delta > 0) delta -= 2*Math.PI;
   const fim = angulo + delta - voltas*2*Math.PI;
-  const vencedor = itens[indiceEm(fim)];
+  const vencedor = itens[iv];
+  // animação: a escolhida no ⚙️, ou uma ao acaso no modo surpresa
+  // (no surpresa, nunca repete a mesma do giro anterior)
+  const surpresa = animEscolhida === 'surpresa';
+  let anim = surpresa ? sortear(Object.keys(ANIMS).filter(k=>k!=='surpresa' && k!==ultimaAnim)) : animEscolhida;
+  // suspense: quase para no fim da fatia vizinha e depois escorrega pro vencedor
+  let quase = anim === 'suspense' ? fim + dentro + fatia*(0.05 + Math.random()*0.15) : null, d2 = null;
+  // isca (modo viciado): quase para na pessoa escolhida e segue andando até o vencedor
+  const ib = isca !== null ? itens.indexOf(isca) : -1;
+  if(ib >= 0){
+    if(ib !== iv){
+      const relB = ib*fatia + fatia*(0.3 + Math.random()*0.4), relF = iv*fatia + dentro;
+      const d = ((relF - relB) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI); // quanto falta andar depois da isca
+      anim = 'suspense'; quase = fim + d; d2 = 1400 + (d/fatia)*280;
+    }
+    isca = null;
+  }
+  const passos = 3 + Math.floor(Math.random()*3); // animação "degraus"
+
+  const listaT = chkPremios.checked ? lerTarefas() : [];
+  const usadas = seq ? seq.lista.map(x=>x.tarefa) : [];
+  let opT = listaT.filter(t=>!usadas.includes(t)); if(!opT.length) opT = listaT;
+  const tarefa = daFila && daFila.premio ? daFila.premio : (opT.length ? sortear(opT) : null);
+
   let nomesDepois = txt.value;
   if(chkRemover.checked){
-    const linhas = txt.value.split('\n'); const k = linhas.findIndex(l=>l.trim()===vencedor);
+    const linhas = txt.value.split('\n'); const k = linhas.findIndex(l=>parseLinha(l).nome===vencedor);
     if(k>=0){ linhas.splice(k,1); nomesDepois = linhas.join('\n'); }
   }
+  const quando = Date.now(), entrada = { nome:vencedor, tarefa, quando };
   // o giro inteiro é decidido aqui e enviado pra todos; cada tela só anima
-  const g = { id: EU + Date.now(), de: angulo, para: fim, nomes: txt.value, vencedor,
-              depois: { nomes: nomesDepois, hist: [vencedor, ...historico] } };
-  if(vicio !== null){ vicio = null; atualizarVicio(); }
+  const g = { id: EU + quando, origem: EU, de: angulo, para: fim, anim, surpresa, quase, d2, passos, nomes: txt.value,
+              vencedor, foto: fotos[vencedor] || null, tarefa, tarefas: listaT,
+              seq: total > 1 ? { k: seq ? seq.k+1 : 1, total, lista: [...(seq ? seq.lista : []), entrada] } : null,
+              depois: { nomes: nomesDepois, hist: [entrada, ...historico] } };
+  if(daFila) fila.shift();
+  atualizarPonto();
   publicar({ giro: g });
   executarGiro(g);
 }
 
 function executarGiro(g){
-  giroAtual = g.id; txt.value = g.nomes; lerNomes();
-  girando = true; document.getElementById('btnGirar').disabled = true;
-  fecharSecreto();
-  document.getElementById('modal').classList.remove('on');
-  const dur = 5200, t0 = performance.now();
+  if(g.origem !== EU) clearTimeout(seqTimer); // outra tela assumiu
+  giroAtual = g.id;
+  pilhaPush({ nomes: g.nomes, hist: g.depois.hist.slice(1).map(norm) });
+  txt.value = g.nomes; lerNomes();
+  girando = true; $('btnGirar').disabled = true; atualizarDesfazer();
+  fecharSecreto(); fecharModal(); fecharPops();
+  const { dur, f } = planoAnim(g, 2*Math.PI/itens.length);
+  if(g.anim) ultimaAnim = g.anim;
+  if(g.surpresa && ANIMS[g.anim]) aviso(`🎲 ${ANIMS[g.anim].ico} ${ANIMS[g.anim].nome}!`); // mostra qual animação saiu
+  const t0 = performance.now(), wrap = document.querySelector('.roda-wrap');
+  wrap.classList.add('girando');
+  angulo = g.de; let ultimo = indiceEm(angulo), antes = angulo;
   function frame(t){
-    if(giroAtual !== g.id || g.feito) return; // outro giro chegou e substituiu este
-    const p = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-p,4);
-    angulo = g.de + (g.para-g.de)*e;
+    if(giroAtual !== g.id || g.feito){ pararEfeitos(); return; } // outro giro chegou e substituiu este
+    const el = Math.min(t - t0, dur);
+    angulo = f(el);
+    // a roda "cresce" um pouquinho quando está rápida
+    const vel = Math.abs(angulo - antes); antes = angulo;
+    cv.style.transform = `scale(${1 + Math.min(0.05, vel*0.09)})`;
     desenhar();
-    if(p<1) requestAnimationFrame(frame); else terminou(g);
+    const i = indiceEm(angulo); if(i !== ultimo){ ultimo = i; tic(); bateSeta(); }
+    if(el < dur) requestAnimationFrame(frame); else terminou(g);
   }
   requestAnimationFrame(frame);
   // aba em segundo plano pausa a animação; garante o fim pelo relógio
-  setTimeout(()=>{ if(giroAtual === g.id && !g.feito){ terminou(g); desenhar(); } }, dur + 200);
+  setTimeout(()=>{ if(giroAtual === g.id && !g.feito) terminou(g); }, dur + 200);
 }
 
 function terminou(g){
-  g.feito = true; girando = false; document.getElementById('btnGirar').disabled = false;
-  angulo = g.para;
-  document.getElementById('nomeVencedor').textContent = g.vencedor;
-  document.getElementById('modal').classList.add('on');
-  historico = g.depois.hist; renderHist();
-  txt.value = g.depois.nomes;
-  confete();
+  pararEfeitos();
+  g.feito = true; girando = false; $('btnGirar').disabled = false;
+  angulo = g.para; desenhar();
+  historico = g.depois.hist.map(norm); renderHist();
+  // a roda continua mostrando o vencedor; o nome some dela quando o card fecha
+  txt.value = g.depois.nomes; lerNomes();
+  atualizarDesfazer();
+  const s = g.seq;
+  if(!s){ mostrarVencedor(g); confete(); return; }
+  const espera = g.tarefa ? 5200 : 3500;
+  if(s.k < s.total){
+    mostrarVencedor(g, `${s.k}º de ${s.total} · próximo giro em instantes…`);
+    confete(true);
+    if(g.origem === EU) seqTimer = setTimeout(()=>girar(s), espera);
+  } else {
+    mostrarVencedor(g, `${s.k}º de ${s.total} · pódio em instantes…`);
+    confete(true);
+    setTimeout(()=>{ if(giroAtual === g.id){ mostrarPodio(s.lista); confete(); } }, espera - 500);
+  }
 }
 
+/* ---- cards ---- */
+let tTarefa;
+function abrirModal(qual){
+  ['vVencedor','vPodio','vEquipes'].forEach(id=>$(id).style.display = id===qual ? '' : 'none');
+  $('card').classList.toggle('larga', qual !== 'vVencedor');
+  const m = $('modal'); m.classList.remove('on'); void m.offsetWidth; m.classList.add('on'); // reinicia o "pop"
+}
+function fecharModal(){
+  $('modal').classList.remove('on'); clearTimeout(tTarefa);
+  if(!girando){ lerNomes(); desenhar(); }
+}
+function mostrarVencedor(g, sub){
+  $('trofeu').textContent = TEMAS[tema].trofeu;
+  $('nomeVencedor').textContent = g.vencedor;
+  const f = $('fotoVencedor');
+  if(g.foto){ f.src = g.foto; f.style.display = 'block'; f.onerror = ()=>{ f.style.display='none'; }; }
+  else { f.style.display = 'none'; f.removeAttribute('src'); }
+  $('parabens').textContent = sub || 'Parabéns! Você foi sorteado(a) na Roleta Senac!';
+  abrirModal('vVencedor');
+  animarTarefa(g.tarefa, g.tarefas || []);
+}
+// mini "roleta" de texto: troca a tarefa rápido e vai desacelerando até a sorteada
+function animarTarefa(final, lista){
+  const el = $('tarefaVencedor'); clearTimeout(tTarefa); el.classList.remove('ok');
+  if(!final){ el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const pool = lista.length > 1 ? lista : [final];
+  let i = 0; const passos = pool.length > 1 ? 16 : 0;
+  (function passo(){
+    if(i >= passos){ el.textContent = '🎁 ' + final; el.classList.add('ok'); return; }
+    el.textContent = '🎁 ' + sortear(pool); tic(); i++;
+    tTarefa = setTimeout(passo, 50 + i*i*1.4);
+  })();
+}
+function mostrarPodio(lista){
+  const med = ['🥇','🥈','🥉'], top = lista.slice(0,3);
+  $('podio').innerHTML = [1,0,2].filter(i=>top[i]).map(i=>`<div class="degrau p${i+1}">
+      <div class="n">${esc(top[i].nome)}</div>
+      ${top[i].tarefa ? `<div class="tf">🎁 ${esc(top[i].tarefa)}</div>` : ''}
+      <div class="bloco">${med[i]}</div></div>`).join('');
+  $('resto').innerHTML = lista.slice(3).map((x,j)=>`<div><b>${j+4}º</b> ${esc(x.nome)}${
+      x.tarefa ? ` <span class="tf">— 🎁 ${esc(x.tarefa)}</span>` : ''}</div>`).join('');
+  abrirModal('vPodio');
+}
+function mostrarEquipes(eq){
+  $('equipes').innerHTML = eq.map((m,i)=>`<div class="equipe" style="background:${cores[i % cores.length]}">
+      <h4>Equipe ${i+1} · ${m.length}</h4>${m.map(n=>`<div>${esc(n)}</div>`).join('')}</div>`).join('');
+  abrirModal('vEquipes'); confete(true);
+}
+function sortearEquipes(){
+  if(girando) return;
+  lerNomes();
+  const q = qtdEquipes;
+  if(itens.length < q){ aviso(`Precisa de pelo menos ${q} nomes na roleta`); return; }
+  const eq = montarEquipes(q);
+  publicar({ equipes: eq }); mostrarEquipes(eq);
+}
+
+// equipes respeitando o modo viciado: separados um em cada, juntos na mesma, resto equilibrado
+function montarEquipes(q){
+  const eq = Array.from({length:q}, ()=>[]);
+  const menor = ()=>{ const m = Math.min(...eq.map(e=>e.length)); return sortear(eq.map((e,i)=>i).filter(i=>eq[i].length===m)); };
+  const sep = embaralharArr(itens.filter(n=>separados.has(n)));
+  const jun = itens.filter(n=>juntos.has(n) && !separados.has(n));
+  const resto = embaralharArr(itens.filter(n=>!separados.has(n) && !juntos.has(n)));
+  const ordem = embaralharArr([...Array(q).keys()]);
+  sep.forEach((n,i)=>eq[ordem[i % q]].push(n));
+  if(jun.length){ const k = menor(); jun.forEach(n=>eq[k].push(n)); }
+  resto.forEach(n=>eq[menor()].push(n));
+  eq.forEach(e=>embaralharArr(e)); // mistura dentro de cada equipe pra não dar na vista
+  return eq;
+}
+
+/* ---- histórico, exportar, desfazer ---- */
 function renderHist(){
   const total = historico.length;
-  document.getElementById('hist').innerHTML = historico.map((nome,i)=>
-    `<div><b>${total-i}º</b> ${nome.replace(/</g,'&lt;')}</div>`).join('');
+  $('cHist').textContent = total || '';
+  $('hist').innerHTML = total ? historico.map((h,i)=>`<div class="h"><span class="pos">${total-i}º</span><div><b>${
+      esc(h.nome)}</b>${h.tarefa ? `<small>🎁 ${esc(h.tarefa)}</small>` : ''}</div></div>`).join('')
+    : vazio('🏁', 'Ninguém foi sorteado ainda', 'Gire a roleta e os vencedores aparecem aqui.');
+  ['btnCSV','btnCopiar','btnLimparRank'].forEach(id=>$(id).disabled = !total);
+}
+const emOrdem = () => [...historico].reverse().map((h,i)=>({ pos:i+1, ...h }));
+function baixarCSV(){
+  if(!historico.length){ aviso('O histórico está vazio'); return; }
+  const cel = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+  const linhas = [['Posição','Nome','Tarefa/prêmio','Data e hora'],
+    ...emOrdem().map(h=>[h.pos+'º', h.nome, h.tarefa || '', h.quando ? new Date(h.quando).toLocaleString('pt-BR') : ''])];
+  const csv = '﻿' + linhas.map(l=>l.map(cel).join(';')).join('\r\n'); // ; e BOM: abre certo no Excel
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' }));
+  a.download = `sorteio-${SALA.replace(/[^\w-]+/g,'_')}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+async function copiarHist(){
+  if(!historico.length){ aviso('O histórico está vazio'); return; }
+  const t = emOrdem().map(h=>`${h.pos}º ${h.nome}${h.tarefa ? ' — ' + h.tarefa : ''}`).join('\n');
+  try{ await navigator.clipboard.writeText(t); }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  aviso('Histórico copiado 📋');
+}
+const pilha = []; // estados anteriores pra desfazer
+const snapshot = () => ({ nomes: txt.value, hist: historico.slice() });
+function pilhaPush(s){ pilha.push(s); if(pilha.length > 30) pilha.shift(); atualizarDesfazer(); }
+function atualizarDesfazer(){ $('btnDesfazer').disabled = girando || !pilha.length; }
+function desfazer(){
+  if(girando || !pilha.length) return;
+  clearTimeout(seqTimer); giroAtual = null;
+  const s = pilha.pop();
+  txt.value = s.nomes; historico = s.hist.map(norm);
+  fecharModal(); renderHist(); lerNomes(); desenhar(); preencherSelect();
+  publicar({ desfazer: true }); atualizarDesfazer(); aviso('Desfeito ↩️');
 }
 
+/* ---- importar, repetidos, listas salvas ---- */
+function aplicarNomes(t){
+  if(girando) return false;
+  txt.value = t; lerNomes(); desenhar(); preencherSelect(); publicar(); return true;
+}
+// de uma linha de planilha, fica só a 1ª coluna (linhas com foto ficam inteiras)
+function primeiraColuna(l, sep){
+  if(l.includes('|')) return l.trim();
+  return l.split(sep)[0].trim().replace(/^"|"$/g,'').trim();
+}
+function semRepetidos(linhas){
+  const vistos = new Set();
+  return linhas.filter(l=>{
+    const k = parseLinha(l).nome.toLocaleLowerCase('pt-BR');
+    if(!k || vistos.has(k)) return false; vistos.add(k); return true;
+  });
+}
+$('btnImportar').onclick = ()=>$('arquivo').click();
+$('arquivo').onchange = async e=>{
+  const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+  const buf = await f.arrayBuffer();
+  let t; // CSV do Excel costuma vir em Windows-1252
+  try{ t = new TextDecoder('utf-8', { fatal:true }).decode(buf); }
+  catch(_){ t = new TextDecoder('windows-1252').decode(buf); }
+  const linhas = t.replace(/^﻿/,'').split(/\r?\n/).map(l=>primeiraColuna(l, /[;,\t]/)).filter(Boolean);
+  if(linhas.length && /^(nomes?|names?|alunos?|participantes?)$/i.test(linhas[0])) linhas.shift();
+  if(!linhas.length){ aviso('Nenhum nome encontrado no arquivo'); return; }
+  const substituir = !txt.value.trim() ||
+    confirm(`${linhas.length} nomes no arquivo.\n\nOK = substituir a lista atual\nCancelar = adicionar ao final`);
+  const antes = substituir ? [] : txt.value.split('\n').filter(l=>l.trim());
+  const fim = semRepetidos([...antes, ...linhas]);
+  if(aplicarNomes(fim.join('\n'))) aviso(`${fim.length} nomes na roleta 📂`);
+};
+// colar direto do Excel: pega só a primeira coluna
+txt.addEventListener('paste', e=>{
+  const t = (e.clipboardData || window.clipboardData).getData('text');
+  if(!t.includes('\t')) return;
+  e.preventDefault();
+  const limpo = t.split(/\r?\n/).map(l=>primeiraColuna(l, '\t')).filter(Boolean).join('\n');
+  txt.setRangeText(limpo, txt.selectionStart, txt.selectionEnd, 'end');
+  txt.dispatchEvent(new Event('input'));
+});
+$('btnRepetidos').onclick = ()=>{
+  const linhas = txt.value.split('\n').filter(l=>parseLinha(l).nome);
+  const fim = semRepetidos(linhas), tirados = linhas.length - fim.length;
+  if(!tirados){ aviso('Nenhum nome repetido 👍'); return; }
+  if(aplicarNomes(fim.join('\n'))) aviso(`${tirados} repetido(s) removido(s) 🧹`);
+};
+
+const CHAVE_LISTAS = 'roleta-senac-listas';
+function listas(){ try{ return JSON.parse(ler(CHAVE_LISTAS)) || {}; }catch(e){ return {}; } }
+function renderListas(sel){
+  const o = listas(), nomes = Object.keys(o).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  $('selListas').innerHTML = `<option value="">📚 ${nomes.length ? 'Listas salvas…' : 'Nenhuma lista salva'}</option>` +
+    nomes.map(k=>`<option value="${esc(k)}">${esc(k)} (${o[k].split('\n').filter(l=>l.trim()).length})</option>`).join('');
+  $('selListas').value = sel || '';
+}
+$('btnSalvarLista').onclick = ()=>{
+  if(!txt.value.trim()){ aviso('A lista está vazia'); return; }
+  const atual = $('selListas').value;
+  const nome = (prompt('Nome da lista (ex.: Turma A):', atual) || '').trim(); if(!nome) return;
+  const o = listas();
+  if(o[nome] !== undefined && nome !== atual && !confirm(`Já existe "${nome}". Substituir?`)) return;
+  o[nome] = txt.value;
+  if(!gravar(CHAVE_LISTAS, JSON.stringify(o))){ aviso('Este navegador não deixou salvar'); return; }
+  renderListas(nome); aviso(`Lista "${nome}" salva 💾`);
+};
+$('selListas').onchange = ()=>{
+  const k = $('selListas').value, o = listas(); if(!k || o[k] === undefined) return;
+  if(aplicarNomes(o[k])) aviso(`Lista "${k}" carregada`);
+};
+$('btnExcluirLista').onclick = ()=>{
+  const k = $('selListas').value; if(!k){ aviso('Escolha uma lista para excluir'); return; }
+  if(!confirm(`Excluir a lista "${k}" deste navegador?`)) return;
+  const o = listas(); delete o[k]; gravar(CHAVE_LISTAS, JSON.stringify(o)); renderListas();
+  aviso('Lista excluída');
+};
+
 function embaralhar(){
-  lerNomes();
-  for(let i=itens.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[itens[i],itens[j]]=[itens[j],itens[i]];}
-  txt.value = itens.join('\n'); desenhar(); preencherSelect(); publicar();
+  const linhas = txt.value.split('\n').filter(l=>parseLinha(l).nome);
+  aplicarNomes(embaralharArr(linhas).join('\n'));
+}
+
+let tAviso;
+function aviso(m){
+  const el = $('aviso'); el.textContent = m; el.classList.add('on');
+  clearTimeout(tAviso); tAviso = setTimeout(()=>el.classList.remove('on'), 2200);
 }
 
 /* ---- modo viciado ---- */
-const sec = document.getElementById('secreto'), sel = document.getElementById('selVicio');
-const campoSenha = document.getElementById('senha');
+const sec = $('secreto');
+const campoSenha = $('senha');
 // SHA-256 da senha (a senha em si não fica escrita no código)
 const HASH_SENHA = '1c918023d679a37e1f3338c9029fe54730b3338643dea17773a25e4c67956699';
 async function sha256(t){
@@ -300,62 +1078,111 @@ async function sha256(t){
   return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 function travar(on){
-  document.getElementById('travado').style.display = on ? '' : 'none';
-  document.getElementById('liberado').style.display = on ? 'none' : '';
-  document.getElementById('senhaErro').style.display = 'none';
+  $('travado').style.display = on ? '' : 'none';
+  $('liberado').style.display = on ? 'none' : '';
+  $('senhaErro').style.display = 'none';
   campoSenha.value = '';
 }
 campoSenha.addEventListener('keydown', async e=>{
   if(e.key !== 'Enter') return;
   if(await sha256(campoSenha.value) === HASH_SENHA){ preencherSelect(); travar(false); }
-  else { document.getElementById('senhaErro').style.display = 'block'; campoSenha.select(); }
+  else { $('senhaErro').style.display = 'block'; campoSenha.select(); }
 });
 function abrirSecreto(){
   // pede a senha toda vez que o painel abre
   travar(true); sec.classList.add('on'); campoSenha.focus();
 }
 function fecharSecreto(){ sec.classList.remove('on'); travar(true); }
+// (re)monta o painel secreto com os nomes atuais
 function preencherSelect(){
   lerNomes();
-  const esc = n=>n.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-  sel.innerHTML = '<option value="">— aleatório —</option>' +
-    itens.map(n=>`<option>${esc(n)}</option>`).join('');
-  sel.value = vicio ?? '';
-  document.getElementById('listaExcluir').innerHTML = itens.map(n=>
+  const opNomes = itens.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  $('filaNome').innerHTML = opNomes;
+  const premios = lerTarefas();
+  $('filaPremio').innerHTML = `<option value="">🎁 prêmio normal</option>` +
+    premios.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
+  $('filaPremio').disabled = !premios.length;
+  $('filaLista').innerHTML = fila.length ? fila.map((f,i)=>`<div class="row"><b>${i+1}º</b><span class="nm">${esc(f.nome)}${
+      f.premio ? ` — 🎁 ${esc(f.premio)}` : ''}</span><button class="rx" data-fila="${i}" title="Tirar da fila">✕</button></div>`).join('')
+    : '<small>Fila vazia: o sorteio é normal.</small>';
+  $('selIsca').innerHTML = '<option value="">— sem isca —</option>' + opNomes;
+  $('selIsca').value = isca ?? '';
+  const livres = itens.filter(n=>!excluidos.has(n)), soma = livres.reduce((a,n)=>a + (pesos.get(n) ?? 1), 0);
+  $('listaChances').innerHTML = itens.map(n=>{
+    const p = pesos.get(n) ?? 1, pct = excluidos.has(n) || !soma ? 0 : Math.round(p/soma*100);
+    return `<div class="row"><span class="nm">${esc(n)}</span><select data-peso="${esc(n)}">${
+      [[0.25,'¼×'],[0.5,'½×'],[1,'1×'],[2,'2×'],[3,'3×'],[5,'5×']].map(([v,r])=>`<option value="${v}"${v===p?' selected':''}>${r}</option>`).join('')
+    }</select><em>${pct}%</em></div>`;
+  }).join('');
+  $('listaEquipes').innerHTML = itens.map(n=>`<div class="row"><span class="nm">${esc(n)}</span>
+      <label><input type="checkbox" data-juntos="${esc(n)}"${juntos.has(n)?' checked':''}>Juntos</label>
+      <label><input type="checkbox" data-separados="${esc(n)}"${separados.has(n)?' checked':''}>Separados</label></div>`).join('');
+  $('listaExcluir').innerHTML = itens.map(n=>
     `<label><input type="checkbox" value="${esc(n)}"${excluidos.has(n)?' checked':''}> ${esc(n)}</label>`).join('');
+  atualizarPonto();
 }
-function atualizarVicio(){
-  document.getElementById('ponto').classList.toggle('on', vicio !== null || excluidos.size > 0);
-  if(sel) sel.value = vicio ?? '';
+// resumo do que está ligado + pontinho discreto no canto
+function atualizarPonto(){
+  const tem = n => itens.includes(n);
+  const partes = [];
+  if(fila.length) partes.push(`🎯 ${fila.length} na fila`);
+  if(isca !== null && tem(isca)) partes.push(`🪝 isca: ${esc(isca)}`);
+  const ch = itens.filter(n=>(pesos.get(n) ?? 1) !== 1).length; if(ch) partes.push(`⚖️ ${ch} com chance mudada`);
+  const j = itens.filter(n=>juntos.has(n)).length, sp = itens.filter(n=>separados.has(n)).length;
+  if(j || sp) partes.push(`🧩 ${j} juntos · ${sp} separados`);
+  const nu = itens.filter(n=>excluidos.has(n)).length; if(nu) partes.push(`🚫 ${nu} nunca`);
+  $('secResumo').innerHTML = partes.length ? partes.join('<br>') : 'Nada ligado — sorteio normal.';
+  $('ponto').classList.toggle('on', partes.length > 0);
 }
-sel.addEventListener('change',()=>{ vicio = sel.value || null; atualizarVicio(); });
-document.getElementById('listaExcluir').addEventListener('change', e=>{
-  if(e.target.checked) excluidos.add(e.target.value); else excluidos.delete(e.target.value);
-  atualizarVicio();
-});
-document.getElementById('btnLimparVicio').onclick = ()=>{
-  vicio = null; excluidos.clear(); atualizarVicio(); fecharSecreto();
+$('secAbas').onclick = e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#secAbas button').forEach(x=>x.classList.toggle('on', x === b));
+  document.querySelectorAll('.sec-pag').forEach(pg=>pg.hidden = pg.dataset.s !== b.dataset.s);
 };
+$('filaAdd').onclick = ()=>{
+  const nome = $('filaNome').value; if(!nome) return;
+  fila.push({ nome, premio: $('filaPremio').value || null }); preencherSelect();
+};
+$('liberado').addEventListener('click', e=>{
+  const b = e.target.closest('[data-fila]'); if(!b) return;
+  fila.splice(+b.dataset.fila, 1); preencherSelect();
+});
+$('liberado').addEventListener('change', e=>{
+  const t = e.target, d = t.dataset;
+  if(t.id === 'selIsca') isca = t.value || null;
+  else if(d.peso !== undefined){ const v = +t.value; v === 1 ? pesos.delete(d.peso) : pesos.set(d.peso, v); }
+  else if(d.juntos !== undefined){ t.checked ? (juntos.add(d.juntos), separados.delete(d.juntos)) : juntos.delete(d.juntos); }
+  else if(d.separados !== undefined){ t.checked ? (separados.add(d.separados), juntos.delete(d.separados)) : separados.delete(d.separados); }
+  else if(t.closest('#listaExcluir')){ t.checked ? excluidos.add(t.value) : excluidos.delete(t.value); }
+  else return;
+  preencherSelect();
+});
+$('btnLimparVicio').onclick = ()=>{
+  fila.length = 0; isca = null; pesos.clear(); juntos.clear(); separados.clear(); excluidos.clear();
+  preencherSelect(); fecharSecreto();
+};
+$('btnFecharSecreto').onclick = fecharSecreto;
 document.addEventListener('keydown', e=>{
+  const a = document.activeElement, digitando = a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName);
   if(e.altKey && e.shiftKey && e.code === 'KeyR'){
     e.preventDefault(); sec.classList.contains('on') ? fecharSecreto() : abrirSecreto();
   } else if(e.key === 'Escape'){
-    fecharSecreto(); document.getElementById('modal').classList.remove('on');
-  } else if(e.code === 'Space' && !sec.contains(document.activeElement) && document.activeElement !== txt){
+    fecharSecreto(); fecharModal();
+  } else if(e.code === 'Space' && !digitando){
     e.preventDefault(); girar();
   }
 });
 
 /* ---- comemoração ---- */
-const CORES_FESTA = ['#F7941D','#004A8D','#ffffff','#FFB347','#FFD54A','#0A66B8'];
-function confete(){
-  const c = document.getElementById('confete'), g = c.getContext('2d');
-  c.width = innerWidth; c.height = innerHeight;
-  const W = c.width, H = c.height, ps = [];
-  const rnd = (a,b)=>a+Math.random()*(b-a), cor = ()=>CORES_FESTA[Math.floor(Math.random()*CORES_FESTA.length)];
+const cvF = $('confete'), gF = cvF.getContext('2d');
+let ps = [], ateConfete = 0, confeteRodando = false;
+function confete(leve){
+  if(cvF.width !== innerWidth || cvF.height !== innerHeight){ cvF.width = innerWidth; cvF.height = innerHeight; }
+  const W = cvF.width, H = cvF.height, festa = TEMAS[tema].festa;
+  const rnd = (a,b)=>a+Math.random()*(b-a), cor = ()=>sortear(festa);
   // canhões laterais
   function canhao(lado){
-    for(let i=0;i<140;i++){
+    for(let i=0;i<(leve?60:140);i++){
       const ang = lado<0 ? rnd(-1.35,-0.6) : rnd(-2.55,-1.8), v = rnd(14,26);
       ps.push({x:lado<0?0:W,y:H,vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,r:rnd(0,6.28),vr:rnd(-.3,.3),
         s:rnd(8,15),cor:cor(),tipo:Math.random()<.3?'c':'r',g:.35,ar:.985,vida:1e9});
@@ -374,76 +1201,133 @@ function confete(){
         tipo:'f',g:.06,ar:.97,vida:rnd(55,85)}); }
   }
   canhao(-1); canhao(1);
-  setTimeout(chuva, 400);
-  [300,800,1300,1800,2400,3000,3600].forEach(t=>setTimeout(fogo,t));
-  const t0 = performance.now();
-  (function f(t){
-    g.clearRect(0,0,W,H);
-    for(const p of ps){
-      p.vx*=p.ar; p.vy=p.vy*p.ar+p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.vida--;
-      if(p.vida<=0 || p.y>H+40) continue;
-      g.save(); g.translate(p.x,p.y); g.rotate(p.r); g.fillStyle=p.cor;
-      if(p.tipo==='f'){ g.globalAlpha=Math.min(1,p.vida/30); g.shadowColor=p.cor; g.shadowBlur=10;
-        g.beginPath(); g.arc(0,0,p.s,0,6.28); g.fill(); }
-      else if(p.tipo==='c'){ g.beginPath(); g.arc(0,0,p.s/2.5,0,6.28); g.fill(); }
-      else g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
-      g.restore();
-    }
-    if(t-t0<7000) requestAnimationFrame(f); else g.clearRect(0,0,W,H);
-  })(t0);
-  fanfarra();
+  if(!leve){ setTimeout(chuva, 400); [300,800,1300,1800,2400,3000,3600].forEach(t=>setTimeout(fogo,t)); }
+  ateConfete = Math.max(ateConfete, performance.now() + (leve ? 4500 : 7000));
+  if(!confeteRodando){ confeteRodando = true; requestAnimationFrame(passoConfete); }
+  fanfarra(leve);
 }
-function fanfarra(){
-  try{
-    const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return;
-    const ac = new AC(), notas = [[523,0],[659,.15],[784,.3],[1047,.45],[784,.7],[1047,.85]];
-    notas.forEach(([fq,t],i)=>{
-      const o = ac.createOscillator(), gn = ac.createGain();
-      o.type='triangle'; o.frequency.value=fq; o.connect(gn); gn.connect(ac.destination);
-      const ini = ac.currentTime+t, dur = i===notas.length-1 ? .9 : .18;
-      gn.gain.setValueAtTime(0,ini); gn.gain.linearRampToValueAtTime(.25,ini+.02);
-      gn.gain.exponentialRampToValueAtTime(.001,ini+dur); o.start(ini); o.stop(ini+dur+.05);
-    });
-  }catch(e){}
+function passoConfete(t){
+  const W = cvF.width, H = cvF.height;
+  gF.clearRect(0,0,W,H);
+  for(const p of ps){
+    p.vx*=p.ar; p.vy=p.vy*p.ar+p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.vida--;
+    if(p.vida<=0 || p.y>H+40) continue;
+    gF.save(); gF.translate(p.x,p.y); gF.rotate(p.r); gF.fillStyle=p.cor;
+    if(p.tipo==='f'){ gF.globalAlpha=Math.min(1,p.vida/30); gF.shadowColor=p.cor; gF.shadowBlur=10;
+      gF.beginPath(); gF.arc(0,0,p.s,0,6.28); gF.fill(); }
+    else if(p.tipo==='c'){ gF.beginPath(); gF.arc(0,0,p.s/2.5,0,6.28); gF.fill(); }
+    else gF.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
+    gF.restore();
+  }
+  ps = ps.filter(p=>p.vida>0 && p.y<=H+40);
+  if(t < ateConfete) requestAnimationFrame(passoConfete);
+  else { ps = []; gF.clearRect(0,0,W,H); confeteRodando = false; }
 }
 
-document.getElementById('btnGirar').onclick = girar;
-document.getElementById('btnCentro').onclick = girar;
-document.getElementById('btnEmbaralhar').onclick = embaralhar;
-// limpar vale pra todas as telas, por isso pede confirmação
-document.getElementById('btnLimparRank').onclick = ()=>{
+/* ---- botões ---- */
+$('btnGirar').onclick = ()=>girar();
+$('btnCentro').onclick = ()=>girar();
+$('btnEmbaralhar').onclick = embaralhar;
+$('btnEquipes').onclick = sortearEquipes;
+$('btnDesfazer').onclick = desfazer;
+$('btnCSV').onclick = baixarCSV;
+$('btnCopiar').onclick = copiarHist;
+$('btnFechar').onclick = fecharModal;
+// quantos vencedores (rodapé do painel)
+let qtd = 1;
+function atualizarQtd(){
+  qtd = Math.max(1, Math.min(qtd, itens.length || 1));
+  $('qTxt').textContent = qtd; $('qLbl').textContent = qtd > 1 ? 'vencedores' : 'vencedor';
+  $('btnGirar').textContent = qtd > 1 ? `🎯 Sortear ${qtd}` : '🎯 Girar!';
+  renderPrevEquipes();
+}
+$('qMenos').onclick = ()=>{ qtd--; atualizarQtd(); };
+$('qMais').onclick = ()=>{ qtd++; if(qtd > itens.length) aviso('Não há mais nomes na roleta'); atualizarQtd(); };
+
+// equipes: escolher quantas e ver a prévia em bolinhas
+let qtdEquipes = 2;
+function renderPrevEquipes(){
+  const n = itens.length, q = qtdEquipes;
+  $('eTxt').textContent = q;
+  if(n < q){ $('prevEquipes').innerHTML = ''; $('prevTxt').textContent = `Precisa de pelo menos ${q} nomes na roleta`; return; }
+  const base = Math.floor(n/q), extra = n % q;
+  $('prevEquipes').innerHTML = Array.from({length:q}, (_,i)=>{
+    const c = cores[i % cores.length], k = base + (i < extra ? 1 : 0);
+    return `<div class="mini-eq" style="border-color:${c};color:${c}">${
+      k > 12 ? `${k} 👤` : `<i style="background:${c}"></i>`.repeat(k)}</div>`;
+  }).join('');
+  $('prevTxt').textContent = `${n} pessoas → ${extra ? `${base} ou ${base+1}` : base} por equipe`;
+}
+$('eMenos').onclick = ()=>{ qtdEquipes = Math.max(2, qtdEquipes-1); renderPrevEquipes(); };
+$('eMais').onclick = ()=>{ qtdEquipes = Math.min(Math.max(2, itens.length), qtdEquipes+1); renderPrevEquipes(); };
+
+// abas
+function abrirAba(a){
+  document.querySelectorAll('.aba').forEach(b=>b.classList.toggle('on', b.dataset.aba === a));
+  document.querySelectorAll('.conteudo').forEach(s=>s.hidden = s.dataset.aba !== a);
+  fecharPops();
+}
+document.querySelectorAll('.aba').forEach(b=>b.onclick = ()=>abrirAba(b.dataset.aba));
+
+// menus ⋯ e ⚙️
+function fecharPops(){ document.querySelectorAll('.pop').forEach(p=>p.hidden = true); }
+document.addEventListener('click', e=>{
+  const gatilho = e.target.closest('[data-pop]');
+  if(gatilho){ const p = $(gatilho.dataset.pop), abrir = p.hidden; fecharPops(); p.hidden = !abrir; return; }
+  if(!e.target.closest('.pop')) fecharPops();
+  else if(e.target.closest('.item')) fecharPops(); // escolheu uma opção do menu
+});
+
+// fichinhas: adicionar e tirar
+ligarCampo($('novoNome'), $('btnAddNome'), addNomes);
+ligarCampo($('novoPremio'), $('btnAddPremio'), addPremios);
+$('chipsNomes').onclick = e=>{
+  const b = e.target.closest('.x'); if(!b) return;
+  const l = linhasNomes(); l.splice(+b.dataset.i, 1); aplicarNomes(l.join('\n'));
+};
+$('chipsPremios').onclick = e=>{
+  const b = e.target.closest('.x'); if(!b) return;
+  const l = lerTarefas(); l.splice(+b.dataset.i, 1); txtTarefas.value = l.join('\n'); renderPremios(); publicar();
+};
+// modo texto (pra colar listas grandes ou usar foto)
+function modoTexto(on){
+  $('areaTexto').hidden = !on; $('chipsNomes').hidden = on;
+  document.querySelector('.add').style.display = on ? 'none' : '';
+  if(on) txt.focus();
+}
+$('btnTexto').onclick = ()=>modoTexto(true);
+$('btnTextoPronto').onclick = ()=>modoTexto(false);
+// limpar vale pra todas as telas, por isso pede confirmação (e dá pra desfazer)
+$('btnLimparRank').onclick = ()=>{
   if(girando || !historico.length || !confirm('Apagar o ranking de sorteados para todos?')) return;
-  historico = []; renderHist(); publicar();
+  pilhaPush(snapshot()); historico = []; renderHist(); publicar({ snap: true });
 };
-document.getElementById('btnLimparRoleta').onclick = ()=>{
+$('btnLimparRoleta').onclick = ()=>{
   if(girando || !txt.value.trim() || !confirm('Apagar todos os nomes da roleta para todos?')) return;
-  txt.value = ''; lerNomes(); desenhar(); publicar(); txt.focus();
+  pilhaPush(snapshot()); txt.value = ''; lerNomes(); desenhar(); publicar({ snap: true }); $('novoNome').focus();
 };
-document.getElementById('btnFechar').onclick = ()=>document.getElementById('modal').classList.remove('on');
 let tEdicao;
-txt.addEventListener('input',()=>{
+function aoEditar(){
   if(girando) return;
   lerNomes(); desenhar();
   clearTimeout(tEdicao); tEdicao = setTimeout(()=>publicar(), 300);
-});
+}
+txt.addEventListener('input', aoEditar);
+txtTarefas.addEventListener('input', aoEditar);
 chkRemover.addEventListener('change',()=>publicar());
+chkPremios.addEventListener('change',()=>{ renderPremios(); publicar(); aviso(chkPremios.checked ? 'Prêmios ligados 🎁' : 'Prêmios desligados'); });
 
 /* ---- sincronização: todos com o link (mesma sala) veem a mesma roleta ---- */
-// sala pelo endereço: .../roleta-senac/#turma2 → sala "turma2"; sem # → "principal"
-const SALA = decodeURIComponent(location.hash.slice(1)) || 'principal';
-const TOPICO = 'jose2gabriel/roleta-senac/v1/' + SALA;
-const EU = Math.random().toString(36).slice(2, 10);
-let cliente = null, giroAtual = null;
-
 function status(on){
-  const el = document.getElementById('status');
+  const el = $('status');
   el.classList.toggle('on', on);
   el.textContent = on ? `🟢 ao vivo · sala ${SALA}` : '🔴 offline · só nesta tela';
 }
 
 function publicar(extra = {}){
   if(!cliente || !cliente.connected) return;
-  const msg = { nomes: txt.value, hist: historico, remover: chkRemover.checked, angulo, origem: EU, ...extra };
+  const msg = { nomes: txt.value, hist: historico, tarefas: txtTarefas.value, premios: chkPremios.checked, remover: chkRemover.checked,
+                angulo, origem: EU, ...extra };
   // retain: quem abrir o site depois recebe o último estado
   cliente.publish(TOPICO, JSON.stringify(msg), { retain: true, qos: 1 });
 }
@@ -452,11 +1336,19 @@ function aoReceber(msg, retido){
   if(msg.origem === EU && !retido) return; // eco da própria mensagem
   if(msg.giro && !retido){ executarGiro(msg.giro); return; }
   if(girando) return;
+  if(!retido){
+    if(msg.snap) pilhaPush(snapshot());       // outra tela limpou algo
+    if(msg.desfazer){ pilha.pop(); clearTimeout(seqTimer); giroAtual = null; fecharModal(); atualizarDesfazer(); }
+  }
   // mensagem retida de um giro antigo: aplica direto o resultado, sem animar
   const s = msg.giro ? { ...msg.giro.depois, angulo: msg.giro.para } : msg;
-  txt.value = s.nomes; historico = s.hist || []; angulo = s.angulo || 0;
+  txt.value = s.nomes; historico = (s.hist || []).map(norm); angulo = s.angulo || 0;
+  if(typeof msg.tarefas === 'string') txtTarefas.value = msg.tarefas;
+  renderPremios();
   chkRemover.checked = !!msg.remover;
+  if(typeof msg.premios === 'boolean'){ chkPremios.checked = msg.premios; renderPremios(); }
   renderHist(); lerNomes(); desenhar();
+  if(msg.equipes && !retido) mostrarEquipes(msg.equipes);
 }
 
 function conectar(){
@@ -469,6 +1361,9 @@ function conectar(){
     try{ aoReceber(JSON.parse(buf.toString()), pkt.retain); }catch(e){}
   });
 }
+
+aplicarTema(ler('roleta-senac-tema'));
+atualizarSom(); renderListas(); renderHist(); renderPremios(); atualizarDesfazer();
 conectar();
 document.fonts && document.fonts.ready.then(()=>{ lerNomes(); desenhar(); });
 lerNomes(); desenhar();
