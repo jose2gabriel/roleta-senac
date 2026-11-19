@@ -93,6 +93,14 @@
   .chip .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .chip .x{background:none;padding:3px 7px;font-size:11px;color:#9aa8b6;border-radius:50%}
   .chip .x:hover{background:#ffdede;color:#c62828}
+  #chipsNomes .chip{cursor:pointer}
+  .chip.faltou{opacity:.45;background:#e6e9ee}
+  .chip.faltou .tx{text-decoration:line-through}
+  .chip.faltou .av{filter:grayscale(1)}
+  .faltaBar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;
+    background:#FFF3E3;border-radius:10px;padding:6px 10px;font-size:12px;font-weight:700;color:var(--azul-esc)}
+  .faltaBar button{padding:5px 10px;font-size:12px}
+  .dicaFalta{font-size:11px;color:#9aa8b6;margin-top:8px}
   @keyframes entra{from{transform:scale(.6);opacity:0}}
   .vazio{text-align:center;color:#7a8a9b;padding:26px 10px;font-size:13px;line-height:1.5}
   .vazio .ico{font-size:52px;display:block;margin-bottom:8px;animation:pula 2s ease-in-out infinite}
@@ -204,6 +212,100 @@
   @keyframes brilhaEstrela{from{transform:scale(.9);filter:drop-shadow(0 0 2px #FFD54A)}to{transform:scale(1.1);filter:drop-shadow(0 0 10px #FFD54A)}}
   @media(prefers-reduced-motion:reduce){.neve{display:none !important}.luz,.estrela{animation:none}}
   @media(max-width:700px){.arvore{display:none !important}}
+  /* ---- equipes salvas (aba) ---- */
+  .tbar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+  .tbar button{background:var(--cinza);color:var(--azul);padding:8px 2px;font-size:11px;
+    display:flex;flex-direction:column;align-items:center;gap:2px}
+  .tbar button span{font-size:18px}
+  .tbar button:hover{background:#dde7f1}
+  .ranking{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .ranking span{background:var(--cinza);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700}
+  .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+  .tcard{border:3px solid var(--c);border-radius:14px;overflow:hidden;background:#fff;transition:transform .2s,box-shadow .2s}
+  .tcard.alvo{transform:scale(1.04);box-shadow:0 0 0 4px rgba(247,148,29,.45)}
+  .tcard.pisca{animation:balanca .4s 2}
+  .th{background:var(--c);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:6px 8px;gap:4px}
+  .th b{font-size:13px;display:flex;align-items:center;gap:4px}
+  .ord{background:#fff;color:var(--c);border-radius:10px;padding:0 6px;font-size:11px}
+  .pts{display:flex;align-items:center;gap:2px}
+  .pts button{background:rgba(255,255,255,.25);color:#fff;padding:1px 8px;font-size:15px;border-radius:8px}
+  .pts button:hover{background:rgba(255,255,255,.45)}
+  .pts em{font-style:normal;font-weight:800;min-width:22px;text-align:center}
+  .tm{padding:6px 6px 2px;display:flex;flex-direction:column;gap:1px;min-height:30px}
+  .tmem{font-size:13px;font-weight:600;padding:3px 6px;border-radius:6px;cursor:grab;user-select:none}
+  .tmem:hover{background:var(--cinza)}
+  .tmem.sel{background:#FFE0B2;outline:2px dashed var(--laranja)}
+  .tfoot{display:flex;justify-content:flex-end;padding:0 4px 4px}
+  .tfoot button{background:none;padding:2px 6px;font-size:14px;opacity:.55}
+  .tfoot button:hover{opacity:1;background:var(--cinza)}
+  .tdica{font-size:11px;color:#9aa8b6;margin:10px 0 8px}
+  .tacoes{display:flex;justify-content:space-between;gap:8px}
+  .tacoes button{padding:8px 12px;font-size:12px}
+  .tacoes .perigo{background:none;color:#c62828;border:1px solid #f0c4c4}
+  .lider{display:inline-block;animation:pula 1.6s ease-in-out infinite}
+  .capBox{margin:4px 0 10px}
+  .capBox .chip{cursor:pointer;font-size:13px}
+  .capBox .chip.on{background:#FFE0B2;outline:2px solid var(--laranja)}
+  .setupOpc{text-align:left;margin:6px 0 4px}
+  /* ---- palco das equipes ---- */
+  .palco{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;
+    background:radial-gradient(circle at center,rgba(0,40,80,.78),rgba(0,10,25,.94))}
+  .palco.on{display:flex}
+  .palco-box{background:#fff;color:var(--azul-esc);border-radius:24px;border-top:12px solid var(--laranja);
+    width:min(1180px,95vw);height:min(780px,92vh);display:flex;flex-direction:column;padding:18px 22px;
+    animation:pop .5s cubic-bezier(.2,1.6,.4,1);box-shadow:0 0 60px rgba(247,148,29,.6)}
+  .palco-box h3{text-align:center;font-size:20px;text-transform:uppercase;letter-spacing:3px;color:var(--laranja-esc);margin-bottom:14px}
+  .palco-meio{flex:1;display:flex;gap:20px;min-height:0}
+  .palco-lado{width:310px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .palco-lado:empty{display:none}
+  .palco-times{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+    gap:14px;align-content:start;padding:6px}
+  .palco-rodape{display:flex;justify-content:center;gap:10px;margin-top:14px}
+  .palco-rodape button{flex:none;padding:12px 34px}
+  .pcard{--c:#004A8D;border-radius:16px;overflow:hidden;background:var(--cinza);position:relative;
+    box-shadow:0 6px 14px rgba(0,0,0,.12);transition:opacity .4s,transform .4s}
+  .pcard h4{background:var(--c);color:#fff;padding:10px 12px;font-size:16px;display:flex;justify-content:space-between;align-items:center}
+  .pcard .pm{padding:8px 10px;display:flex;flex-direction:column;gap:5px;min-height:70px}
+  .pnome{background:#fff;border-left:5px solid var(--c);border-radius:8px;padding:6px 10px;font-weight:700;font-size:15px}
+  .pnome.oculto,.carta.oculto{visibility:hidden}
+  .pcard.balanca{animation:balanca .35s}
+  @keyframes balanca{25%{transform:rotate(-3deg) scale(1.05)}75%{transform:rotate(3deg) scale(1.05)}}
+  .pcard.apagado{opacity:.35;transform:scale(.96)}
+  .pcard.escolhido{opacity:1;transform:scale(1.04);box-shadow:0 0 0 5px var(--c),0 10px 30px rgba(0,0,0,.25)}
+  .posBadge{background:#fff;color:var(--c);border-radius:12px;padding:1px 10px;font-weight:800;font-size:15px}
+  .voador{position:fixed;z-index:60;pointer-events:none;background:#fff;border-radius:8px;padding:6px 10px;font-weight:800;
+    color:var(--azul-esc);box-shadow:0 10px 24px rgba(0,0,0,.35);white-space:nowrap;font-size:15px}
+  .voador.verso,.dcard{background:repeating-linear-gradient(45deg,var(--azul),var(--azul) 6px,var(--azul-esc) 6px,var(--azul-esc) 12px);
+    border:3px solid #fff;color:transparent}
+  .pote-ico{font-size:70px;animation:raios 2.5s linear infinite}
+  .pote{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-content:center;max-height:440px;overflow:hidden}
+  .pote .pnome{border-left-color:var(--laranja);font-size:13px;padding:4px 8px;background:var(--cinza)}
+  .vez{font-size:24px;font-weight:800;min-height:40px;text-align:center;color:var(--azul)}
+  .vez.entra{animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+  .miniRoda{position:relative}
+  .miniRoda canvas{width:280px;height:280px;border-radius:50%;
+    box-shadow:0 0 0 6px #fff,0 0 0 11px var(--laranja),0 12px 30px rgba(0,0,0,.3)}
+  .miniSeta{position:absolute;top:-12px;left:50%;transform:translateX(-50%);z-index:2;width:0;height:0;
+    border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid var(--laranja);
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+  .deck{position:relative;width:130px;height:180px}
+  .dcard{position:absolute;inset:0;border-radius:14px;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+  .carta{perspective:700px}
+  .carta .ci{position:relative;transform-style:preserve-3d;transition:transform .5s;transform:rotateY(180deg)}
+  .carta.aberta .ci{transform:none}
+  .carta .fr{backface-visibility:hidden}
+  .carta .vs{position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);border-radius:8px;
+    background:repeating-linear-gradient(45deg,var(--azul),var(--azul) 6px,var(--azul-esc) 6px,var(--azul-esc) 12px);border:2px solid #fff}
+  .cortina{position:absolute;inset:0;display:flex;z-index:2;pointer-events:none}
+  .cortina i{flex:1;background:repeating-linear-gradient(90deg,#B71C1C 0 14px,#8E1B1B 14px 28px);
+    transition:transform 1s cubic-bezier(.6,0,.2,1);box-shadow:inset 0 -10px 20px rgba(0,0,0,.3)}
+  .pcard.aberta .cortina i:first-child{transform:translateX(-101%)}
+  .pcard.aberta .cortina i:last-child{transform:translateX(101%)}
+  .cortina b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px;transition:opacity .3s}
+  .pcard.aberta .cortina b{opacity:0}
+  .pcard.tambor{animation:treme .12s linear infinite}
+  @keyframes treme{25%{transform:translate(-2px,1px) rotate(-1deg)}75%{transform:translate(2px,-1px) rotate(1deg)}}
+  @media(max-width:760px){.palco-meio{flex-direction:column}.palco-lado{width:100%}.miniRoda canvas{width:200px;height:200px}}
   /* modal */
   .modal{position:fixed;inset:0;background:rgba(0,20,45,.75);display:none;align-items:center;
     justify-content:center;z-index:10}
@@ -322,7 +424,9 @@
         <button class="girar" id="btnAddNome" title="Adicionar" style="flex:none">＋</button>
         <button class="sec" data-pop="popMais" title="Mais opções" style="padding:0 12px">⋯</button>
       </div>
+      <div class="faltaBar" id="faltaBar" hidden></div>
       <div class="chips" id="chipsNomes"></div>
+      <div class="dicaFalta" id="dicaFalta">💡 Toque num nome para marcar que faltou hoje</div>
       <div id="areaTexto" hidden>
         <div class="modoTexto"><span>✏️ Um nome por linha · foto: <code>Ana | link-da-foto</code></span>
           <button class="girar" id="btnTextoPronto" style="flex:none">Pronto</button></div>
@@ -351,14 +455,26 @@ Heitor</textarea>
 
     <!-- 🧩 equipes -->
     <section class="conteudo" data-aba="equipes" hidden>
-      <div class="grande">
-        <p>Em quantas equipes?</p>
-        <div class="stepper big">
-          <button id="eMenos">−</button><div><b id="eTxt">2</b><small>equipes</small></div><button id="eMais">+</button>
+      <div id="timesSalvos"></div>
+      <div id="equipesSetup">
+        <div class="grande">
+          <p>Em quantas equipes?</p>
+          <div class="stepper big">
+            <button id="eMenos">−</button><div><b id="eTxt">2</b><small>equipes</small></div><button id="eMais">+</button>
+          </div>
+          <div class="prev" id="prevEquipes"></div>
+          <div class="prevTxt" id="prevTxt"></div>
+          <div class="setupOpc">
+            <label class="sw"><input type="checkbox" id="chkCapitaes"><span class="trilho"></span>👑 Ter um capitão em cada equipe</label>
+            <div class="capBox" id="capBox" hidden>
+              <small style="color:#7a8a9b;display:block;margin-bottom:6px">Toque para escolher os capitães — quem não for escolhido é sorteado.</small>
+              <div class="chips" id="capChips" style="margin-top:0"></div>
+            </div>
+            <div class="pop-tit">🎬 Animação do sorteio</div>
+            <div class="anims" id="animsEq"></div>
+          </div>
+          <button class="girar" id="btnEquipes" style="margin-top:10px">🧩 Sortear equipes</button>
         </div>
-        <div class="prev" id="prevEquipes"></div>
-        <div class="prevTxt" id="prevTxt"></div>
-        <button class="girar" id="btnEquipes">🧩 Sortear equipes</button>
       </div>
     </section>
 
@@ -429,10 +545,6 @@ Heitor</textarea>
       <div class="podio" id="podio"></div>
       <div class="resto" id="resto"></div>
     </div>
-    <div id="vEquipes" style="display:none">
-      <h3>👥 Equipes sorteadas</h3>
-      <div class="equipes" id="equipes"></div>
-    </div>
     <button class="girar" id="btnFechar">Fechar</button>
   </div>
 </div>
@@ -479,6 +591,19 @@ Heitor</textarea>
 </div>
 <div class="ponto" id="ponto"></div>
 <div class="aviso" id="aviso"></div>
+<div class="palco" id="palco">
+  <div class="palco-box">
+    <h3 id="palcoTit">👥 Sorteando equipes…</h3>
+    <div class="palco-meio">
+      <div class="palco-lado" id="palcoLado"></div>
+      <div class="palco-times" id="palcoTimes"></div>
+    </div>
+    <div class="palco-rodape">
+      <button class="sec" id="btnPular">⏩ Pular animação</button>
+      <button class="girar" id="btnPalcoFechar" hidden>Fechar</button>
+    </div>
+  </div>
+</div>
 <div class="neve natal-only" id="neve" aria-hidden="true"></div>
 <div class="arvore esq natal-only" id="arvEsq" aria-hidden="true"></div>
 <div class="arvore dir natal-only" id="arvDir" aria-hidden="true"></div>
@@ -523,7 +648,7 @@ function aplicarTema(t){
   document.body.dataset.tema = tema; cores = TEMAS[tema].roda;
   document.querySelectorAll('.tema').forEach(b=>b.classList.toggle('on', b.dataset.tema === tema));
   gravar('roleta-senac-tema', tema);
-  desenhar(); renderChipsNomes();
+  desenhar(); renderChipsNomes(); if(typeof renderTimes === 'function') renderTimes();
 }
 $('temas').onclick = e=>{ const b = e.target.closest('.tema'); if(b) aplicarTema(b.dataset.tema); };
 
@@ -544,12 +669,16 @@ function parseLinha(l){
   const f = l.slice(k+1).trim();
   return { nome:l.slice(0,k).trim(), foto:/^https?:\/\//i.test(f) ? f : null };
 }
+// todos = todos os nomes da lista · itens = só quem veio hoje (é quem entra na roleta e nas equipes)
+let todos = [];
+const faltas = new Set();
 function lerNomes(){
-  itens = []; fotos = {};
+  todos = []; fotos = {};
   for(const l of txt.value.split('\n')){
     const p = parseLinha(l); if(!p.nome) continue;
-    itens.push(p.nome); if(p.foto) fotos[p.nome] = p.foto;
+    todos.push(p.nome); if(p.foto) fotos[p.nome] = p.foto;
   }
+  itens = todos.filter(n=>!faltas.has(n));
   renderChipsNomes();
 }
 const lerTarefas = () => txtTarefas.value.split('\n').map(s=>s.trim()).filter(Boolean);
@@ -565,8 +694,13 @@ function avatar(n, i){
 }
 function renderChipsNomes(){
   $('cNomes').textContent = itens.length || '';
-  $('chipsNomes').innerHTML = itens.length ? itens.map((n,i)=>`<span class="chip">${avatar(n,i)}<span class="tx">${
-      esc(n)}</span><button class="x" data-i="${i}" title="Tirar ${esc(n)}">✕</button></span>`).join('')
+  const nf = todos.filter(n=>faltas.has(n)).length;
+  $('faltaBar').hidden = !nf;
+  $('faltaBar').innerHTML = `<span>🚫 ${nf} faltou${nf>1?'ram':''} hoje</span><button class="sec" id="btnPresentes">✅ Todos presentes</button>`;
+  $('dicaFalta').hidden = !todos.length;
+  $('chipsNomes').innerHTML = todos.length ? todos.map((n,i)=>`<span class="chip${faltas.has(n)?' faltou':''}" data-n="${esc(n)}" title="${
+      faltas.has(n)?'Faltou hoje — toque para marcar presença':'Toque para marcar falta'}">${faltas.has(n)?'<span class="av emo">🚫</span>':avatar(n,i)}<span class="tx">${
+      esc(n)}</span><button class="x" data-i="${i}" title="Tirar ${esc(n)} da lista">✕</button></span>`).join('')
     : vazio('🎡', 'A roleta está vazia', 'Digite os nomes acima, um de cada vez,<br>ou importe uma lista pelo botão ⋯');
   if(typeof atualizarQtd === 'function') atualizarQtd();
 }
@@ -836,7 +970,7 @@ function girar(seq){
   }
   const quando = Date.now(), entrada = { nome:vencedor, tarefa, quando };
   // o giro inteiro é decidido aqui e enviado pra todos; cada tela só anima
-  const g = { id: EU + quando, origem: EU, de: angulo, para: fim, anim, surpresa, quase, d2, passos, nomes: txt.value,
+  const g = { id: EU + quando, origem: EU, faltas: [...faltas], de: angulo, para: fim, anim, surpresa, quase, d2, passos, nomes: txt.value,
               vencedor, foto: fotos[vencedor] || null, tarefa, tarefas: listaT,
               seq: total > 1 ? { k: seq ? seq.k+1 : 1, total, lista: [...(seq ? seq.lista : []), entrada] } : null,
               depois: { nomes: nomesDepois, hist: [entrada, ...historico] } };
@@ -850,6 +984,7 @@ function executarGiro(g){
   if(g.origem !== EU) clearTimeout(seqTimer); // outra tela assumiu
   giroAtual = g.id;
   pilhaPush({ nomes: g.nomes, hist: g.depois.hist.slice(1).map(norm) });
+  if(Array.isArray(g.faltas)){ faltas.clear(); g.faltas.forEach(n=>faltas.add(n)); } // mesma roda em todas as telas
   txt.value = g.nomes; lerNomes();
   girando = true; $('btnGirar').disabled = true; atualizarDesfazer();
   fecharSecreto(); fecharModal(); fecharPops();
@@ -900,7 +1035,7 @@ function terminou(g){
 /* ---- cards ---- */
 let tTarefa;
 function abrirModal(qual){
-  ['vVencedor','vPodio','vEquipes'].forEach(id=>$(id).style.display = id===qual ? '' : 'none');
+  ['vVencedor','vPodio'].forEach(id=>$(id).style.display = id===qual ? '' : 'none');
   $('card').classList.toggle('larga', qual !== 'vVencedor');
   const m = $('modal'); m.classList.remove('on'); void m.offsetWidth; m.classList.add('on'); // reinicia o "pop"
 }
@@ -952,27 +1087,15 @@ function mostrarPodio(lista){
       x.tarefa ? ` <span class="tf">— 🎁 ${esc(x.tarefa)}</span>` : ''}</div>`).join('');
   abrirModal('vPodio');
 }
-function mostrarEquipes(eq){
-  $('equipes').innerHTML = eq.map((m,i)=>`<div class="equipe" style="background:${cores[i % cores.length]}">
-      <h4>Equipe ${i+1} · ${m.length}</h4>${m.map(n=>`<div>${esc(n)}</div>`).join('')}</div>`).join('');
-  abrirModal('vEquipes'); confete(true);
-}
-function sortearEquipes(){
-  if(girando) return;
-  lerNomes();
-  const q = qtdEquipes;
-  if(itens.length < q){ aviso(`Precisa de pelo menos ${q} nomes na roleta`); return; }
-  const eq = montarEquipes(q);
-  publicar({ equipes: eq }); mostrarEquipes(eq);
-}
-
 // equipes respeitando o modo viciado: separados um em cada, juntos na mesma, resto equilibrado
-function montarEquipes(q){
+// (capitães escolhidos também ficam um em cada equipe)
+function montarEquipes(q, caps = []){
   const eq = Array.from({length:q}, ()=>[]);
   const menor = ()=>{ const m = Math.min(...eq.map(e=>e.length)); return sortear(eq.map((e,i)=>i).filter(i=>eq[i].length===m)); };
-  const sep = embaralharArr(itens.filter(n=>separados.has(n)));
-  const jun = itens.filter(n=>juntos.has(n) && !separados.has(n));
-  const resto = embaralharArr(itens.filter(n=>!separados.has(n) && !juntos.has(n)));
+  const sep = [...embaralharArr(caps.filter(n=>itens.includes(n))),
+               ...embaralharArr(itens.filter(n=>separados.has(n) && !caps.includes(n)))];
+  const jun = itens.filter(n=>juntos.has(n) && !separados.has(n) && !caps.includes(n));
+  const resto = embaralharArr(itens.filter(n=>!separados.has(n) && !juntos.has(n) && !caps.includes(n)));
   const ordem = embaralharArr([...Array(q).keys()]);
   sep.forEach((n,i)=>eq[ordem[i % q]].push(n));
   if(jun.length){ const k = menor(); jun.forEach(n=>eq[k].push(n)); }
@@ -1214,8 +1337,8 @@ document.addEventListener('keydown', e=>{
   if(e.altKey && e.shiftKey && e.code === 'KeyR'){
     e.preventDefault(); sec.classList.contains('on') ? fecharSecreto() : abrirSecreto();
   } else if(e.key === 'Escape'){
-    fecharSecreto(); fecharModal();
-  } else if(e.code === 'Space' && !digitando){
+    fecharSecreto(); fecharModal(); if(palcoAberto()) fecharPalco();
+  } else if(e.code === 'Space' && !digitando && !palcoAberto()){
     e.preventDefault(); girar();
   }
 });
@@ -1296,7 +1419,7 @@ let qtdEquipes = 2;
 function renderPrevEquipes(){
   const n = itens.length, q = qtdEquipes;
   $('eTxt').textContent = q;
-  if(n < q){ $('prevEquipes').innerHTML = ''; $('prevTxt').textContent = `Precisa de pelo menos ${q} nomes na roleta`; return; }
+  if(n < q){ $('prevEquipes').innerHTML = ''; $('prevTxt').textContent = `Precisa de pelo menos ${q} nomes na roleta`; renderCapChips(); return; }
   const base = Math.floor(n/q), extra = n % q;
   $('prevEquipes').innerHTML = Array.from({length:q}, (_,i)=>{
     const c = cores[i % cores.length], k = base + (i < extra ? 1 : 0);
@@ -1304,6 +1427,7 @@ function renderPrevEquipes(){
       k > 12 ? `${k} 👤` : `<i style="background:${c}"></i>`.repeat(k)}</div>`;
   }).join('');
   $('prevTxt').textContent = `${n} pessoas → ${extra ? `${base} ou ${base+1}` : base} por equipe`;
+  renderCapChips();
 }
 $('eMenos').onclick = ()=>{ qtdEquipes = Math.max(2, qtdEquipes-1); renderPrevEquipes(); };
 $('eMais').onclick = ()=>{ qtdEquipes = Math.min(Math.max(2, itens.length), qtdEquipes+1); renderPrevEquipes(); };
@@ -1328,7 +1452,19 @@ document.addEventListener('click', e=>{
 // fichinhas: adicionar e tirar
 ligarCampo($('novoNome'), $('btnAddNome'), addNomes);
 ligarCampo($('novoPremio'), $('btnAddPremio'), addPremios);
+function marcarFalta(n){
+  if(girando) return;
+  faltas.has(n) ? faltas.delete(n) : faltas.add(n);
+  lerNomes(); desenhar(); preencherSelect(); publicar();
+  aviso(faltas.has(n) ? `🚫 ${n} faltou hoje` : `✅ ${n} está presente`);
+}
+$('faltaBar').onclick = e=>{
+  if(!e.target.closest('#btnPresentes') || girando) return;
+  faltas.clear(); lerNomes(); desenhar(); preencherSelect(); publicar(); aviso('✅ Todos presentes');
+};
 $('chipsNomes').onclick = e=>{
+  const c = e.target.closest('.chip');
+  if(c && !e.target.closest('.x')){ marcarFalta(c.dataset.n); return; }
   const b = e.target.closest('.x'); if(!b) return;
   const l = linhasNomes(); l.splice(+b.dataset.i, 1); aplicarNomes(l.join('\n'));
 };
@@ -1364,6 +1500,474 @@ txtTarefas.addEventListener('input', aoEditar);
 chkRemover.addEventListener('change',()=>publicar());
 chkPremios.addEventListener('change',()=>{ renderPremios(); publicar(); aviso(chkPremios.checked ? 'Prêmios ligados 🎁' : 'Prêmios desligados'); });
 
+/* ---- equipes: sorteio animado, aba salva, placar, capitães e ordem de apresentação ---- */
+// times = { id, lista:[{ membros:[nomes], capitao, pontos }], ordem:[índices]|null } — vai pra todas as telas
+let times = null, mostrarSetup = false, selMembro = null, ultimaAnimEq = null;
+const capEscolhidos = new Set();
+const corTime = i => cores[i % cores.length];
+const nomeTime = i => `Equipe ${i+1}`;
+const limitar = (v,a,b) => Math.max(a, Math.min(b, v));
+
+const ANIMS_EQ = {
+  aleatoria: { ico:'🎲', nome:'Aleatória' },
+  voando:    { ico:'🕊️', nome:'Voando' },
+  roleta:    { ico:'🎡', nome:'Roleta' },
+  cartas:    { ico:'🃏', nome:'Cartas' },
+  cortina:   { ico:'🎭', nome:'Cortina' },
+};
+let animEq = ANIMS_EQ[ler('roleta-senac-animEq')] ? ler('roleta-senac-animEq') : 'aleatoria';
+$('animsEq').innerHTML = Object.entries(ANIMS_EQ).map(([k,v])=>`<button class="anim" data-anim-eq="${k}"><span>${v.ico}</span>${v.nome}</button>`).join('');
+function marcarAnimEq(){ document.querySelectorAll('[data-anim-eq]').forEach(b=>b.classList.toggle('on', b.dataset.animEq === animEq)); }
+$('animsEq').onclick = e=>{
+  const b = e.target.closest('[data-anim-eq]'); if(!b) return;
+  animEq = b.dataset.animEq; gravar('roleta-senac-animEq', animEq); marcarAnimEq();
+};
+marcarAnimEq();
+
+// capitães
+$('chkCapitaes').onchange = ()=>{ $('capBox').hidden = !$('chkCapitaes').checked; renderCapChips(); };
+function renderCapChips(){
+  if(!$('chkCapitaes').checked) return;
+  $('capChips').innerHTML = itens.map((n,i)=>`<span class="chip${capEscolhidos.has(n)?' on':''}" data-cap="${esc(n)}">${
+    capEscolhidos.has(n)?'<span class="av emo">👑</span>':avatar(n,i)}<span class="tx">${esc(n)}</span></span>`).join('');
+}
+$('capChips').onclick = e=>{
+  const c = e.target.closest('[data-cap]'); if(!c) return;
+  const n = c.dataset.cap;
+  if(capEscolhidos.has(n)) capEscolhidos.delete(n);
+  else if([...capEscolhidos].filter(x=>itens.includes(x)).length >= qtdEquipes){ aviso(`Já tem ${qtdEquipes} capitães (um por equipe)`); return; }
+  else capEscolhidos.add(n);
+  renderCapChips();
+};
+
+/* ---- sons e confete das equipes ---- */
+function plim(){
+  const a = audio(); if(!a) return; const t = a.currentTime;
+  [[1568,0],[2093,.07]].forEach(([f,d])=>{
+    const o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.value = f;
+    o.connect(g); g.connect(a.destination);
+    g.gain.setValueAtTime(0,t+d); g.gain.linearRampToValueAtTime(.16,t+d+.01); g.gain.exponentialRampToValueAtTime(.001,t+d+.25);
+    o.start(t+d); o.stop(t+d+.3);
+  });
+}
+function tambor(ms){
+  const a = audio(); if(!a) return; const t = a.currentTime, tot = ms/1000;
+  for(let x=0; x<tot; x+=.05){
+    const o = a.createOscillator(), g = a.createGain(); o.type = 'triangle'; o.frequency.value = 85 + Math.random()*30;
+    o.connect(g); g.connect(a.destination);
+    g.gain.setValueAtTime(.1 + .2*(x/tot), t+x); g.gain.exponentialRampToValueAtTime(.001, t+x+.045);
+    o.start(t+x); o.stop(t+x+.05);
+  }
+}
+function confeteEm(x, y, cor){
+  if(cvF.width !== innerWidth || cvF.height !== innerHeight){ cvF.width = innerWidth; cvF.height = innerHeight; }
+  for(let i=0;i<90;i++){
+    const a = Math.random()*6.28, v = 3 + Math.random()*9;
+    ps.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-4,r:Math.random()*6.28,vr:(Math.random()-.5)*.4,s:6+Math.random()*8,
+      cor:Math.random()<.6?cor:sortear(['#fff','#FFD54A']),tipo:Math.random()<.3?'c':'r',g:.25,ar:.98,vida:1e9});
+  }
+  ateConfete = Math.max(ateConfete, performance.now() + 3500);
+  if(!confeteRodando){ confeteRodando = true; requestAnimationFrame(passoConfete); }
+}
+
+/* ---- palco (tela grande onde as equipes são reveladas) ---- */
+let palcoToken = 0, pularPalco = false;
+const palcoAberto = () => $('palco').classList.contains('on');
+const espera = ms => new Promise(r=>{ if(pularPalco) return r(); setTimeout(r, ms); });
+function abrirPalco(tit){
+  fecharModal(); fecharPops(); fecharSecreto();
+  $('palcoTit').textContent = tit; $('palcoLado').innerHTML = ''; $('palcoTimes').innerHTML = '';
+  $('btnPular').hidden = false; $('btnPalcoFechar').hidden = true;
+  $('palco').classList.add('on');
+}
+function fecharPalco(){
+  palcoToken++; $('palco').classList.remove('on');
+  document.querySelectorAll('.voador').forEach(v=>v.remove());
+  renderTimes();
+}
+function terminarPalco(tit){
+  $('palcoTit').textContent = tit; $('btnPular').hidden = true; $('btnPalcoFechar').hidden = false;
+  confete(true);
+}
+$('btnPular').onclick = ()=>{ pularPalco = true; };
+$('btnPalcoFechar').onclick = fecharPalco;
+
+// um nome (ou carta) "voa" de um ponto da tela até o lugar dele no card da equipe
+function voar(el, x0, y0, alvo, dur){
+  return new Promise(res=>{
+    el.classList.add('voador'); el.style.left = x0 + 'px'; el.style.top = y0 + 'px';
+    document.body.appendChild(el);
+    const r = alvo.getBoundingClientRect(), dx = r.left - x0, dy = r.top - y0;
+    const fim = ()=>{ el.remove(); res(); };
+    if(pularPalco || !el.animate){ fim(); return; }
+    const a = el.animate([
+      { transform:'translate(0,0) scale(1)' },
+      { transform:`translate(${dx/2}px,${dy/2-90}px) scale(1.35) rotate(${dx>0?14:-14}deg)`, offset:.5 },
+      { transform:`translate(${dx}px,${dy}px) scale(1)` }], { duration:dur, easing:'cubic-bezier(.4,0,.3,1)' });
+    a.onfinish = fim; setTimeout(fim, dur + 400);
+  });
+}
+const cardPalco = i => $('palcoTimes').querySelector(`.pcard[data-t="${i}"]`);
+function balancar(card){ card.classList.remove('balanca'); void card.offsetWidth; card.classList.add('balanca'); }
+function contar(i){ const c = cardPalco(i); c.querySelector('.pc').textContent = c.querySelectorAll('.pm > *').length; }
+function montarCardsPalco(t, comCortina){
+  $('palcoTimes').innerHTML = t.lista.map((e,i)=>`<div class="pcard" data-t="${i}" style="--c:${corTime(i)}">
+      <h4><span>${nomeTime(i)}</span><span class="pc">0</span></h4><div class="pm"></div>
+      ${comCortina ? '<div class="cortina"><i></i><i></i><b>🥁</b></div>' : ''}</div>`).join('');
+}
+const rotulo = (n, cap) => (cap ? '👑 ' : '') + n;
+function addNome(i, nome, cap, oculto){
+  const d = document.createElement('div');
+  d.className = 'pnome' + (oculto ? ' oculto' : ''); d.textContent = rotulo(nome, cap);
+  cardPalco(i).querySelector('.pm').appendChild(d); contar(i); return d;
+}
+function addCarta(i, nome, cap){
+  const d = document.createElement('div');
+  d.className = 'carta oculto';
+  d.innerHTML = `<div class="ci"><div class="pnome fr">${esc(rotulo(nome, cap))}</div><div class="vs"></div></div>`;
+  cardPalco(i).querySelector('.pm').appendChild(d); contar(i); return d;
+}
+// ordem de distribuição: rodada por rodada (capitães primeiro), como um "draft"
+function ordemDistribuicao(t){
+  const out = [], max = Math.max(...t.lista.map(e=>e.membros.length));
+  for(let r=0;r<max;r++) t.lista.forEach((e,i)=>{ const n = e.membros[r]; if(n) out.push({ nome:n, ti:i, cap: e.capitao === n }); });
+  return out;
+}
+
+async function revelarEquipes(t, anim){
+  const tk = ++palcoToken; pularPalco = false;
+  if(anim) ultimaAnimEq = anim;
+  abrirPalco(`${ANIMS_EQ[anim]?.ico || '👥'} Sorteando equipes…`);
+  const ordem = ordemDistribuicao(t);
+  montarCardsPalco(t, anim === 'cortina');
+  try{
+    if(anim === 'voando') await animVoando(ordem, tk);
+    else if(anim === 'roleta') await animRoletaPessoa(t, ordem, tk);
+    else if(anim === 'cartas') await animCartas(ordem, tk);
+    else await animCortina(t, ordem, tk);
+  }catch(e){ console.error(e); }
+  if(tk !== palcoToken) return;
+  if(pularPalco){ // pulou: mostra tudo pronto
+    montarCardsPalco(t, false); ordem.forEach(o=>addNome(o.ti, o.nome, o.cap, false));
+  }
+  document.querySelectorAll('#palcoTimes .oculto').forEach(x=>x.classList.remove('oculto'));
+  $('palcoLado').innerHTML = ''; // no fim, as equipes ocupam o palco todo
+  terminarPalco('🎉 Equipes formadas!');
+}
+
+// 🕊️ os nomes saem voando da roleta (o "pote") e caem na equipe, um por um
+async function animVoando(ordem, tk){
+  $('palcoLado').innerHTML = `<div class="pote-ico">🎡</div><div class="pote">${
+    ordem.map((o,k)=>`<span class="pnome" data-k="${k}">${esc(rotulo(o.nome, o.cap))}</span>`).join('')}</div>`;
+  await espera(700);
+  const intervalo = limitar(4500/ordem.length, 170, 520);
+  for(const [k,o] of ordem.entries()){
+    if(tk !== palcoToken) return;
+    const alvo = addNome(o.ti, o.nome, o.cap, true), src = $('palcoLado').querySelector(`[data-k="${k}"]`);
+    if(pularPalco){ alvo.classList.remove('oculto'); continue; }
+    const r = src.getBoundingClientRect(); src.style.visibility = 'hidden';
+    const v = document.createElement('div'); v.textContent = rotulo(o.nome, o.cap);
+    voar(v, r.left, r.top, alvo, 650).then(()=>{ alvo.classList.remove('oculto'); balancar(cardPalco(o.ti)); plim(); });
+    await espera(intervalo);
+  }
+  await espera(800);
+}
+
+// 🎡 a roda vira uma roda de equipes e gira uma vez para cada pessoa
+function rodaSimples(c, labels, cols, ang){
+  const g = c.getContext('2d'), W = c.width, R = W/2, n = labels.length, f = 2*Math.PI/n;
+  g.clearRect(0,0,W,W);
+  const fs = Math.max(16, Math.min(40, 260/n + 12));
+  for(let i=0;i<n;i++){
+    const a0 = ang + i*f - Math.PI/2;
+    g.beginPath(); g.moveTo(R,R); g.arc(R,R,R,a0,a0+f); g.closePath();
+    g.fillStyle = cols[i]; g.fill(); g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 4; g.stroke();
+    g.save(); g.translate(R,R); g.rotate(a0+f/2); g.textAlign = 'right'; g.textBaseline = 'middle';
+    g.font = `800 ${fs}px Montserrat, sans-serif`; g.fillStyle = '#fff'; g.fillText(labels[i], R-26, 0, R-70); g.restore();
+  }
+  g.beginPath(); g.arc(R,R,46,0,7); g.fillStyle = '#fff'; g.fill();
+}
+const idxEm = (a,n) => { const f = 2*Math.PI/n, rel = ((-a) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI); return Math.floor(rel/f) % n; };
+function girarRodaSimples(c, labels, cols, ang, idx, dur, dentro = rnd(.2,.8), voltas = 3){
+  return new Promise(res=>{
+    const n = labels.length, f = 2*Math.PI/n, alvo = -(idx*f + f*dentro);
+    let delta = (alvo - ang % (2*Math.PI)) % (2*Math.PI); if(delta > 0) delta -= 2*Math.PI;
+    const fim = ang + delta - voltas*2*Math.PI, de = ang, t0 = performance.now();
+    let ult = idxEm(de, n), feito = false;
+    const acabar = ()=>{ if(feito) return; feito = true; rodaSimples(c, labels, cols, fim); res(fim); };
+    (function fr(t){
+      if(feito) return;
+      const p = pularPalco ? 1 : Math.min(1, (t - t0)/dur), a = de + (fim - de)*easeOut(p, 3);
+      rodaSimples(c, labels, cols, a);
+      const k = idxEm(a, n); if(k !== ult){ ult = k; tic(); }
+      if(p < 1) requestAnimationFrame(fr); else acabar();
+    })(t0);
+    setTimeout(acabar, dur + 300);
+  });
+}
+async function animRoletaPessoa(t, ordem, tk){
+  $('palcoLado').innerHTML = `<div class="vez" id="vez">Prontos?</div>
+    <div class="miniRoda"><div class="miniSeta"></div><canvas id="cvTimes" width="600" height="600"></canvas></div>`;
+  const cvT = $('cvTimes'), labels = t.lista.map((_,i)=>nomeTime(i)), cols = t.lista.map((_,i)=>corTime(i));
+  let ang = 0; rodaSimples(cvT, labels, cols, ang);
+  await espera(700);
+  const dur = limitar(10000/ordem.length, 650, 1700);
+  for(const o of ordem){
+    if(tk !== palcoToken) return;
+    if(pularPalco){ addNome(o.ti, o.nome, o.cap, false); continue; }
+    const vez = $('vez'); vez.textContent = rotulo(o.nome, o.cap); vez.classList.remove('entra'); void vez.offsetWidth; vez.classList.add('entra');
+    ang = await girarRodaSimples(cvT, labels, cols, ang, o.ti, dur);
+    if(tk !== palcoToken) return;
+    const alvo = addNome(o.ti, o.nome, o.cap, true);
+    if(pularPalco){ alvo.classList.remove('oculto'); continue; }
+    const r = vez.getBoundingClientRect(), v = document.createElement('div'); v.textContent = rotulo(o.nome, o.cap);
+    voar(v, r.left + r.width/2 - 50, r.top, alvo, 480).then(()=>{ alvo.classList.remove('oculto'); balancar(cardPalco(o.ti)); plim(); });
+    await espera(280);
+  }
+  await espera(700);
+}
+
+// 🃏 cartas viradas: embaralha, distribui viradas para baixo e depois vira uma a uma
+async function animCartas(ordem, tk){
+  $('palcoLado').innerHTML = `<div class="deck" id="deck">${Array.from({length:Math.min(8, ordem.length)}, (_,i)=>
+    `<div class="dcard" style="transform:translate(${-i*2}px,${-i*2}px)"></div>`).join('')}</div><div class="vez" id="vez">🃏 Embaralhando…</div>`;
+  const deck = $('deck');
+  for(let r=0;r<4 && !pularPalco;r++){
+    deck.querySelectorAll('.dcard').forEach((d,i)=>d.animate && d.animate([
+      { transform:`translate(${-i*2}px,${-i*2}px)` },
+      { transform:`translate(${rnd(-80,80)}px,${rnd(-40,40)}px) rotate(${rnd(-25,25)}deg)` },
+      { transform:`translate(${-i*2}px,${-i*2}px)` }], { duration:420, easing:'ease-in-out' }));
+    tic(); await espera(460);
+  }
+  if(tk !== palcoToken) return;
+  $('vez').textContent = '🃏 Distribuindo…';
+  const cartas = [], intervalo = limitar(3800/ordem.length, 140, 420);
+  for(const o of ordem){
+    if(tk !== palcoToken) return;
+    const slot = addCarta(o.ti, o.nome, o.cap); cartas.push(slot);
+    if(pularPalco){ slot.classList.remove('oculto'); continue; }
+    const r = deck.getBoundingClientRect(), sr = slot.getBoundingClientRect(), v = document.createElement('div');
+    v.classList.add('verso'); v.style.width = sr.width + 'px'; v.style.height = sr.height + 'px';
+    voar(v, r.left + r.width/2 - sr.width/2, r.top + 40, slot, 520).then(()=>{ slot.classList.remove('oculto'); balancar(cardPalco(o.ti)); tic(); });
+    await espera(intervalo);
+  }
+  await espera(700);
+  if(tk !== palcoToken) return;
+  $('vez').textContent = '✨ Virando as cartas…';
+  for(const c of cartas){
+    if(tk !== palcoToken) return;
+    c.classList.remove('oculto'); c.classList.add('aberta'); if(!pularPalco) plim();
+    await espera(limitar(2600/cartas.length, 90, 300));
+  }
+  $('vez').textContent = '';
+  await espera(500);
+}
+
+// 🎭 cada equipe atrás de uma cortina: rufar de tambor, abre, confete na cor da equipe
+async function animCortina(t, ordem, tk){
+  ordem.forEach(o=>addNome(o.ti, o.nome, o.cap, false));
+  await espera(500);
+  for(let i=0;i<t.lista.length;i++){
+    if(tk !== palcoToken) return;
+    const c = cardPalco(i);
+    if(!pularPalco){ c.scrollIntoView({ block:'nearest', behavior:'smooth' }); c.classList.add('tambor'); tambor(1100); }
+    await espera(1100);
+    c.classList.remove('tambor'); c.classList.add('aberta');
+    if(!pularPalco){
+      const r = c.getBoundingClientRect(); confeteEm(r.left + r.width/2, r.top + 40, corTime(i)); fanfarra(true);
+    }
+    await espera(800);
+  }
+  document.querySelectorAll('#palcoTimes .pcard').forEach(c=>c.classList.add('aberta'));
+}
+
+/* ---- sortear equipes ---- */
+function sortearEquipes(){
+  if(girando || palcoAberto()) return;
+  lerNomes();
+  const q = qtdEquipes;
+  if(itens.length < q){ aviso(`Precisa de pelo menos ${q} nomes na roleta`); return; }
+  const comCap = $('chkCapitaes').checked;
+  const caps = comCap ? [...capEscolhidos].filter(n=>itens.includes(n)) : [];
+  const eq = montarEquipes(q, caps);
+  const lista = eq.map(m=>{
+    const cap = comCap ? (m.find(n=>caps.includes(n)) || sortear(m)) : null;
+    return { membros: cap ? [cap, ...m.filter(n=>n !== cap)] : m, capitao: cap, pontos: 0 };
+  });
+  const anim = animEq === 'aleatoria'
+    ? sortear(Object.keys(ANIMS_EQ).filter(k=>k !== 'aleatoria' && k !== ultimaAnimEq)) : animEq;
+  times = { id: EU + Date.now(), lista, ordem: null };
+  mostrarSetup = false; selMembro = null;
+  renderTimes();
+  publicar({ animEq: anim, timesId: times.id });
+  revelarEquipes(times, anim);
+}
+
+/* ---- 🎤 roleta de equipes: quem apresenta primeiro / ordem completa ---- */
+function sortearOrdem(completa){
+  if(!times || girando || palcoAberto()) return;
+  const n = times.lista.length;
+  let rest = [...Array(n).keys()];
+  const plano = [];
+  for(let k=0; k < (completa ? n-1 : 1); k++){
+    const t = sortear(rest); plano.push({ t, d: rnd(.2,.8) }); rest = rest.filter(x=>x !== t);
+  }
+  if(completa) plano.push({ t: rest[0], auto: true });
+  times.ordem = plano.map(p=>p.t);
+  renderTimes();
+  publicar({ animOrdem: plano, timesId: times.id });
+  mostrarOrdem(plano);
+}
+async function mostrarOrdem(plano){
+  if(!times) return;
+  const tk = ++palcoToken; pularPalco = false;
+  const n = times.lista.length;
+  abrirPalco(plano.length > 1 ? '🎤 Ordem de apresentação' : '🎤 Quem apresenta primeiro?');
+  $('palcoLado').innerHTML = `<div class="vez" id="vez">🥁</div>
+    <div class="miniRoda"><div class="miniSeta"></div><canvas id="cvTimes" width="600" height="600"></canvas></div>`;
+  $('palcoTimes').innerHTML = times.lista.map((e,i)=>`<div class="pcard apagado" data-t="${i}" style="--c:${corTime(i)}">
+      <h4><span>${nomeTime(i)}</span><span class="posBadge" hidden></span></h4>
+      <div class="pm">${e.membros.map(m=>`<div class="pnome">${esc(rotulo(m, e.capitao === m))}</div>`).join('')}</div></div>`).join('');
+  const cvT = $('cvTimes');
+  let rest = [...Array(n).keys()], ang = 0;
+  rodaSimples(cvT, rest.map(nomeTime), rest.map(corTime), ang);
+  await espera(600);
+  for(const [k,p] of plano.entries()){
+    if(tk !== palcoToken) return;
+    $('vez').textContent = plano.length > 1 ? `${k+1}º a apresentar…` : 'Quem começa?';
+    if(!p.auto){
+      ang = await girarRodaSimples(cvT, rest.map(nomeTime), rest.map(corTime), ang, rest.indexOf(p.t), 2600, p.d, 5);
+      if(tk !== palcoToken) return;
+    }
+    const c = cardPalco(p.t), b = c.querySelector('.posBadge');
+    b.hidden = false; b.textContent = `${k+1}º`;
+    c.classList.remove('apagado'); c.classList.add('escolhido');
+    $('vez').textContent = `${k+1}º · ${nomeTime(p.t)}`;
+    if(!pularPalco){ const r = c.getBoundingClientRect(); confeteEm(r.left + r.width/2, r.top + 30, corTime(p.t)); fanfarra(true); }
+    rest = rest.filter(x=>x !== p.t);
+    if(rest.length) rodaSimples(cvT, rest.map(nomeTime), rest.map(corTime), ang);
+    await espera(plano.length > 1 ? 1200 : 400);
+  }
+  if(tk !== palcoToken) return;
+  terminarPalco(plano.length > 1 ? '🎤 Ordem definida!' : `🎤 ${nomeTime(plano[0].t)} começa!`);
+}
+
+/* ---- aba Equipes: cards salvos, placar, arrastar, re-sortear, exportar ---- */
+function renderTimes(){
+  const box = $('timesSalvos');
+  $('equipesSetup').hidden = !!times && !mostrarSetup;
+  if(!times){ box.innerHTML = ''; return; }
+  const L = times.lista, max = Math.max(...L.map(e=>e.pontos));
+  const rank = L.map((e,i)=>({ i, p:e.pontos })).sort((a,b)=>b.p - a.p), med = ['🥇','🥈','🥉'];
+  box.innerHTML = `
+    <div class="tbar">
+      <button data-tacao="primeiro" title="Gira a roleta de equipes uma vez"><span>🎤</span>Quem começa</button>
+      <button data-tacao="ordem" title="Sorteia a ordem de todas as equipes"><span>🔢</span>Ordem</button>
+      <button data-tacao="copiar"><span>📋</span>Copiar</button>
+      <button data-tacao="csv"><span>📊</span>Planilha</button>
+    </div>
+    ${max > 0 ? `<div class="ranking">${rank.map((r,k)=>`<span>${med[k] || (k+1)+'º'} ${nomeTime(r.i)} · ${r.p}</span>`).join('')}</div>` : ''}
+    <div class="tgrid" id="tGrid">${L.map((e,i)=>{
+      const pos = times.ordem ? times.ordem.indexOf(i) : -1;
+      return `<div class="tcard" data-t="${i}" style="--c:${corTime(i)}">
+        <div class="th"><b>${pos >= 0 ? `<span class="ord">${pos+1}º</span>` : ''}${nomeTime(i)}${
+          max > 0 && e.pontos === max ? ' <span class="lider" title="1º lugar">👑</span>' : ''}</b>
+          <span class="pts"><button data-pt="-1" title="Tirar 1 ponto">−</button><em>${e.pontos}</em><button data-pt="1" title="Dar 1 ponto">+</button></span></div>
+        <div class="tm">${e.membros.map(n=>`<div class="tmem${selMembro && selMembro.nome === n ? ' sel' : ''}" draggable="true" data-n="${esc(n)}">${
+          e.capitao === n ? '👑 ' : ''}${esc(n)}</div>`).join('')}</div>
+        <div class="tfoot"><button data-resortear title="Re-sortear esta equipe (troca os membros com as outras)">🎲</button></div>
+      </div>`; }).join('')}</div>
+    <div class="tdica">💡 Arraste um nome para outra equipe — ou toque no nome e depois na equipe.</div>
+    <div class="tacoes"><button class="sec" data-tacao="novo">🔄 Novo sorteio</button><button class="perigo" data-tacao="apagar">🗑️ Apagar equipes</button></div>`;
+}
+function salvarTimes(){ renderTimes(); publicar(); }
+function moverMembro(nome, de, para){
+  if(!times || de === para) return;
+  const A = times.lista[de], B = times.lista[para];
+  if(!A || !B || !A.membros.includes(nome)) return;
+  A.membros = A.membros.filter(n=>n !== nome);
+  if(A.capitao === nome) A.capitao = null; // capitão que muda de equipe deixa de ser capitão
+  B.membros.push(nome);
+  selMembro = null; salvarTimes();
+  const c = $('tGrid').querySelector(`.tcard[data-t="${para}"]`); if(c) c.classList.add('pisca');
+  aviso(`${nome} → ${nomeTime(para)}`);
+}
+function resortearTime(i){
+  const L = times.lista, outros = [...L.keys()].filter(k=>k !== i);
+  if(!outros.length) return;
+  for(const n of [...L[i].membros]){
+    if(n === L[i].capitao) continue;
+    const cand = [];
+    outros.forEach(k=>L[k].membros.forEach(m=>{ if(m !== L[k].capitao) cand.push([k, m]); }));
+    if(!cand.length) break;
+    const [k, m] = sortear(cand);
+    L[i].membros[L[i].membros.indexOf(n)] = m; L[k].membros[L[k].membros.indexOf(m)] = n;
+  }
+  salvarTimes();
+  document.querySelectorAll('#tGrid .tcard').forEach(c=>c.classList.add('pisca'));
+  aviso(`🎲 ${nomeTime(i)} re-sorteada`);
+}
+function textoTimes(){
+  return times.lista.map((e,i)=>`${nomeTime(i)}${e.pontos ? ` (${e.pontos} pts)` : ''}${
+    times.ordem && times.ordem.includes(i) ? ` — ${times.ordem.indexOf(i)+1}º a apresentar` : ''}\n${
+    e.membros.map(n=>`${e.capitao === n ? '👑 ' : '• '}${n}`).join('\n')}`).join('\n\n');
+}
+async function copiarTimes(){
+  const t = textoTimes();
+  try{ await navigator.clipboard.writeText(t); }
+  catch(e){ const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  aviso('Equipes copiadas 📋');
+}
+function baixarTimesCSV(){
+  const cel = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+  const linhas = [['Equipe','Nome','Capitão','Pontos da equipe','Ordem de apresentação']];
+  times.lista.forEach((e,i)=>e.membros.forEach(n=>linhas.push([nomeTime(i), n, e.capitao === n ? 'sim' : '', e.pontos,
+    times.ordem && times.ordem.includes(i) ? times.ordem.indexOf(i)+1 : ''])));
+  const csv = '﻿' + linhas.map(l=>l.map(cel).join(';')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' }));
+  a.download = `equipes-${SALA.replace(/[^\w-]+/g,'_')}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+$('timesSalvos').addEventListener('click', e=>{
+  const ac = e.target.closest('[data-tacao]');
+  if(ac){
+    const k = ac.dataset.tacao;
+    if(k === 'primeiro') sortearOrdem(false);
+    else if(k === 'ordem') sortearOrdem(true);
+    else if(k === 'copiar') copiarTimes();
+    else if(k === 'csv') baixarTimesCSV();
+    else if(k === 'novo'){ mostrarSetup = !mostrarSetup; renderTimes(); if(mostrarSetup) $('equipesSetup').scrollIntoView({ behavior:'smooth' }); }
+    else if(k === 'apagar' && confirm('Apagar as equipes e o placar para todos?')){ times = null; selMembro = null; salvarTimes(); }
+    return;
+  }
+  const card = e.target.closest('.tcard'); if(!card) return;
+  const i = +card.dataset.t;
+  const pt = e.target.closest('[data-pt]');
+  if(pt){ times.lista[i].pontos += +pt.dataset.pt; if(+pt.dataset.pt > 0) plim(); salvarTimes(); return; }
+  if(e.target.closest('[data-resortear]')){ resortearTime(i); return; }
+  const m = e.target.closest('.tmem');
+  if(m){ selMembro = selMembro && selMembro.nome === m.dataset.n ? null : { nome: m.dataset.n, de: i }; renderTimes(); return; }
+  if(selMembro) moverMembro(selMembro.nome, selMembro.de, i);
+});
+$('timesSalvos').addEventListener('dragstart', e=>{
+  const m = e.target.closest('.tmem'); if(!m) return;
+  e.dataTransfer.setData('text/plain', JSON.stringify({ n: m.dataset.n, de: +m.closest('.tcard').dataset.t }));
+  e.dataTransfer.effectAllowed = 'move';
+});
+$('timesSalvos').addEventListener('dragover', e=>{
+  const c = e.target.closest('.tcard'); if(!c) return;
+  e.preventDefault();
+  document.querySelectorAll('#tGrid .tcard.alvo').forEach(x=>x !== c && x.classList.remove('alvo'));
+  c.classList.add('alvo');
+});
+$('timesSalvos').addEventListener('dragleave', e=>{ const c = e.target.closest('.tcard'); if(c && !c.contains(e.relatedTarget)) c.classList.remove('alvo'); });
+$('timesSalvos').addEventListener('drop', e=>{
+  const c = e.target.closest('.tcard'); if(!c) return;
+  e.preventDefault(); c.classList.remove('alvo');
+  try{ const d = JSON.parse(e.dataTransfer.getData('text/plain')); moverMembro(d.n, d.de, +c.dataset.t); }catch(_){}
+});
+
 /* ---- sincronização: todos com o link (mesma sala) veem a mesma roleta ---- */
 function status(on){
   const el = $('status');
@@ -1373,7 +1977,7 @@ function status(on){
 
 function publicar(extra = {}){
   if(!cliente || !cliente.connected) return;
-  const msg = { nomes: txt.value, hist: historico, tarefas: txtTarefas.value, premios: chkPremios.checked, remover: chkRemover.checked,
+  const msg = { nomes: txt.value, hist: historico, tarefas: txtTarefas.value, premios: chkPremios.checked, faltas: [...faltas], times, remover: chkRemover.checked,
                 angulo, origem: EU, ...extra };
   // retain: quem abrir o site depois recebe o último estado
   cliente.publish(TOPICO, JSON.stringify(msg), { retain: true, qos: 1 });
@@ -1388,6 +1992,7 @@ function aoReceber(msg, retido){
     if(msg.desfazer){ pilha.pop(); clearTimeout(seqTimer); giroAtual = null; fecharModal(); atualizarDesfazer(); }
   }
   // mensagem retida de um giro antigo: aplica direto o resultado, sem animar
+  if(Array.isArray(msg.faltas)){ faltas.clear(); msg.faltas.forEach(n=>faltas.add(n)); }
   const s = msg.giro ? { ...msg.giro.depois, angulo: msg.giro.para } : msg;
   txt.value = s.nomes; historico = (s.hist || []).map(norm); angulo = s.angulo || 0;
   if(typeof msg.tarefas === 'string') txtTarefas.value = msg.tarefas;
@@ -1395,7 +2000,11 @@ function aoReceber(msg, retido){
   chkRemover.checked = !!msg.remover;
   if(typeof msg.premios === 'boolean'){ chkPremios.checked = msg.premios; renderPremios(); }
   renderHist(); lerNomes(); desenhar();
-  if(msg.equipes && !retido) mostrarEquipes(msg.equipes);
+  if('times' in msg){ times = msg.times || null; renderTimes(); }
+  if(!retido && times && msg.timesId === times.id){
+    if(msg.animEq) revelarEquipes(times, msg.animEq);
+    else if(msg.animOrdem) mostrarOrdem(msg.animOrdem);
+  }
 }
 
 function conectar(){
@@ -1497,7 +2106,7 @@ addEventListener('resize', ()=>{ clearTimeout(tFestao); tFestao = setTimeout(mon
 montarNatal();
 
 aplicarTema(ler('roleta-senac-tema'));
-atualizarSom(); renderListas(); renderHist(); renderPremios(); atualizarDesfazer();
+atualizarSom(); renderListas(); renderHist(); renderPremios(); renderTimes(); atualizarDesfazer();
 conectar();
 document.fonts && document.fonts.ready.then(()=>{ lerNomes(); desenhar(); });
 lerNomes(); desenhar();
